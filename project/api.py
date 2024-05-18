@@ -849,3 +849,15 @@ def shareworkout(userid: str, workout_name: str, date: datetime):
 
     return {"response": "workout data not found"}
 
+@app.get("/bring_shared_workoutid")
+def bring_shared_workoutid(chosed_user: str):
+    session = Session()
+
+    find = session.query(shared_workout_table).filter(shared_workout_table.c.userid == chosed_user).all()
+
+    workoutid_lst = []
+    for f in find:
+        workoutid_lst.append(f[2])
+
+    return {"response": workoutid_lst}
+

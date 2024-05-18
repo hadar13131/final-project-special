@@ -323,3 +323,13 @@ class Client:
         )
 
         return response.json()
+
+    def bring_shared_workoutid(self, chosed_user):
+        credentials = dict(chosed_user=chosed_user)
+
+        response = requests.get(
+            f"{self.server_address}/bring_shared_workoutid",
+            params=credentials
+        )
+
+        return response.json()
