@@ -13,6 +13,7 @@ class Client:
         self.username = None
         self.password = None
         self.first_name = None
+        self.privacy = None
         self.user_exer_lst = []
         self.user_workout_lst = []
 
@@ -31,6 +32,7 @@ class Client:
             self.first_name = self.find_first_name(userid=self.username)["response"]
             self.user_workout_lst = self.lst_of_workouts_by_username(userid=self.username)["response"]
             self.user_exer_lst = self.lst_of_exercise_names(userid=self.username)["response"]
+            self.privacy = self.find_privacy(userid=self.username)["response"]
 
         return response.json()
 
@@ -86,6 +88,7 @@ class Client:
             f"{self.server_address}/signup",
             params=credentials
         )
+        self.privacy = False
         return response.json()
 
     def fill_info(self, name, first_name, last_name, phone_num, email, age, gender, goals):
@@ -278,3 +281,45 @@ class Client:
 
         return response.json()
 
+
+    def change_privacy(self, name, public):
+        credentials = dict(name=name, public=public)
+
+        response = requests.get(
+            f"{self.server_address}/change_privacy",
+            params=credentials
+        )
+
+        self.privacy = self.find_privacy(userid=self.username)["response"]
+
+        return response.json()
+
+    def find_privacy(self, userid):
+        credentials = dict(userid=userid)
+
+        response1 = requests.get(
+            f"{self.server_address}/find_privacy",
+            params=credentials
+        )
+
+        return response1.json()
+
+    def public_user_lst(self, userid):
+        credentials = dict(userid=userid)
+
+        response1 = requests.get(
+            f"{self.server_address}/public_user_lst",
+            params=credentials
+        )
+
+        return response1.json()
+
+    def shareworkout(self, userid, workout_name, date):
+        credentials = dict(userid=userid, workout_name=workout_name, date=date)
+
+        response = requests.get(
+            f"{self.server_address}/shareworkout",
+            params=credentials
+        )
+
+        return response.json()

@@ -5,11 +5,8 @@ import json
 import flet as ft
 import math
 
-
 import login_signup
 import learn_more_page
-
-
 
 class First_page:
 
@@ -32,7 +29,6 @@ class First_page:
         self.button_to_learnmore = ft.ElevatedButton(text="To learn more", on_click=self.go_to_learnmore,
                                                      bgcolor='#8532B8',
                                                      color='white')
-
 
         self.main_panel = ft.Column(
             # width=600,

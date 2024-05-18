@@ -811,6 +811,12 @@ class ShowTheWorkout:
         self.button_delete_workout = ft.ElevatedButton(text="delete", on_click=self.delete_workout, bgcolor='#8532B8',
                                                        color='white')
 
+        self.button_show_share_workout = ft.ElevatedButton(text="share workout", on_click=self.show_share_workout,
+                                                            bgcolor='#8532B8', color='white')
+
+        self.button_share_workout = ft.ElevatedButton(text="share", on_click=self.share_workout, bgcolor='#8532B8',
+                                                       color='white')
+
     def date_workout(self):
         lst = []
         for index in range(len(self.workout_lst)):
@@ -828,7 +834,6 @@ class ShowTheWorkout:
             lst_name_workout_dropdown.append(ft.dropdown.Option(i[2]))
 
         self.lst_name_workout = ft.Dropdown(
-            width=100,
             options=lst_name_workout_dropdown,
         )
 
@@ -841,8 +846,8 @@ class ShowTheWorkout:
             self.button_delete_workout
         ])
 
-        self.page.clean()
-        self.page.add(self.delete_fomat)
+        # self.page.clean()
+        self.page.add(ft.Row([self.delete_fomat]))
         self.page.update()
 
     def delete_workout(self, e: ft.ControlEvent):
@@ -850,6 +855,41 @@ class ShowTheWorkout:
         response = self.client.deleteworkout(self.client.username, workout_name, self.date)
         self.page.clean()
         self.calndar_format()
+
+
+
+    def show_share_workout(self, e: ft.ControlEvent):
+        lst = self.date_workout()
+
+        lst_name_workout_dropdown = []
+        for i in lst:
+            lst_name_workout_dropdown.append(ft.dropdown.Option(i[2]))
+
+        self.lst_name_workout = ft.Dropdown(
+            options=lst_name_workout_dropdown,
+        )
+
+        self.share_fomate = ft.Column([
+            ft.Text("choose the workout you want to share- ", size=35, color='#8532B8', weight=ft.FontWeight.W_500,
+                    selectable=True,
+                    font_family="Elephant"),
+
+            self.lst_name_workout,
+
+            self.button_share_workout
+        ])
+
+        # self.page.clean()
+        self.page.add(ft.Row([self.share_fomate]))
+        self.page.update()
+
+    def share_workout(self, e: ft.ControlEvent):
+        workout_name = self.lst_name_workout.value
+        response = self.client.shareworkout(self.client.username, workout_name, self.date)
+        self.page.clean()
+        self.calndar_format()
+
+
 
     def check1(self):
         lst = self.date_workout()
@@ -865,6 +905,7 @@ class ShowTheWorkout:
             final_lst = self.show_workout(lst)
             self.calndar_format()
             self.page.add(self.button_show_delete_workout)
+            self.page.add(self.button_show_share_workout)
             self.page.add(ft.Column(final_lst))
             self.page.update()
             # for i in final_lst:

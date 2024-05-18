@@ -48,6 +48,12 @@ class Profile_Page:
 
         self.button1 = ft.ElevatedButton(text="change", on_click=self.change_your_info, bgcolor='#8532B8', color='white')
 
+        self.public = ft.CupertinoSwitch(
+            label="Public Account",
+            on_change=self.change_privacy,
+            value=self.client.privacy,
+        )
+
         self.info_page = ft.Container(
                              margin=20,
                              padding=20,
@@ -83,6 +89,7 @@ class Profile_Page:
                                          self.age,
                                          self.gender,
                                          self.goals,
+                                         self.public,
                                          self.button1,
                                          self.massageE
                                      ]),
@@ -242,6 +249,12 @@ class Profile_Page:
         #
         #
         #     )
+
+    def change_privacy(self, e: ft.ControlEvent):
+        public = self.public.value
+        response = self.client.change_privacy(name=self.client.username, public=public)
+        self.massageE.value = response["response"]
+        self.page.update()
 
     def button_count(self, value: str):
         button = ft.FilledButton(

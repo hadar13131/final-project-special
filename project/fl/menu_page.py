@@ -8,6 +8,8 @@ from datetime import datetime
 import show_improvement
 import add_workout
 import profile_page
+import share_page
+
 
 import login_signup
 import deleteuser_signout
@@ -69,6 +71,12 @@ class MenuApp:
             app_instance.main(self.page)
             # self.page.add(ft.SafeArea(self.show_improvement_page()))
 
+        elif selected_index == 3: #share page
+            self.page.clean()
+            app_instance = share_page.SharePage(client=self.client)
+            app_instance.main(self.page)
+            # self.page.add(ft.SafeArea(self.show_improvement_page()))
+
     def main(self, page: ft.Page):
         self.page = page
         self.page.navigation_bar = ft.CupertinoNavigationBar(
@@ -81,6 +89,7 @@ class MenuApp:
                 ft.NavigationDestination(icon=ft.icons.PERSON_OUTLINE_ROUNDED, label="Profile Page"),
                 ft.NavigationDestination(icon=ft.icons.CALENDAR_TODAY, label="Calendar"),
                 ft.NavigationDestination(icon=ft.icons.TRENDING_UP_ROUNDED, label="progress"),
+                ft.NavigationDestination(icon=ft.icons.MESSAGE, label="Share Page"),
             ]
         )
 

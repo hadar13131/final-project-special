@@ -2,6 +2,8 @@
 import json
 import sqlite3
 import hashlib
+from typing import Dict, List, Any
+
 from fastapi import FastAPI, HTTPException, Depends
 from sqlalchemy import Table, Column, create_engine, MetaData, String, Boolean, INTEGER, JSON, update, DateTime
 from sqlalchemy.orm.session import sessionmaker
@@ -18,7 +20,7 @@ Session = sessionmaker(bind=engine)
 
 # create table to save users information
 user_table = Table(
-    "user_tb", md,
+    "users_tb", md,
     Column("name", String, primary_key=True),
     Column("password", String),
     Column("first_name", String),
@@ -27,7 +29,8 @@ user_table = Table(
     Column("email", String),
     Column("age", INTEGER),
     Column("gender", String),
-    Column("goals", String)
+    Column("goals", String),
+    Column("public", Boolean)
 )
 
 md.create_all(engine)
@@ -45,19 +48,15 @@ workout_table = Table(
 md.create_all(engine)
 
 
-# #create table to save users massages
-# massage_table = Table(
-#     "workouts", md,
-#     Column("massageid", INTEGER, primary_key=True),
-#     Column("massage_type", String),
-#     Column("from_user", String),
-#     Column("to_user", String),
-#     Column("date", DateTime),
-#     Column("the_massage", JSON)
-# )
-#
-# md.create_all(engine)
+#create table to save users massages
+shared_workout_table = Table(
+    "share_workout_tb", md,
+    Column("msgid", INTEGER, primary_key=True),
+    Column("userid", String),
+    Column("workoutid", INTEGER)
+)
 
+md.create_all(engine)
 
 # to hash the password
 # def hash_password(password: str) -> str:
@@ -115,7 +114,8 @@ def signup(name: str, password: str) -> dict[str, str]:
             email="",
             age="",
             gender="",
-            goals=""
+            goals="",
+            public=False
         )
     )
     session.commit()
@@ -142,7 +142,8 @@ def fill_info(name: str, first_name: str, last_name: str, phone_num: str, email:
             email=email,
             age=age,
             gender=gender,
-            goals=goals
+            goals=goals,
+            public=False
         )
 
         session.execute(stmt)
@@ -167,6 +168,7 @@ def signout(name: str, password: str) -> dict[str, str]:
             return {"response": "the details are correct"}
 
     return {"response": "the details are not match"}
+
 
 # end signuout
 
@@ -204,6 +206,7 @@ def delete(name: str, password: str) -> dict[str, str]:
 
     return {"response": "user data not found"}
 
+
 # end delete
 
 
@@ -220,6 +223,7 @@ def authenticate(name: str, password: str) -> dict[str, str]:
             return {"response": "user authenticated"}
 
     return {"response": "user data not found"}
+
 
 # end authenticate
 
@@ -257,6 +261,7 @@ def check_email(email: str) -> dict[str, str]:
             return {"response": "the email not valid, try to login"}
 
     return {"response": "the email is valid"}
+
 
 # end check_email
 
@@ -509,25 +514,25 @@ def deletesetfromexercise(userid: str, date: datetime, workout_name: str, exerci
     workoutid1 = find[0][0]  # the workout id of the first workout
 
     for f in find:
-        if f[2] == workout_name: #find the specific workout by name
-            exec_lst = f[4] #save the exercise list
+        if f[2] == workout_name:  # find the specific workout by name
+            exec_lst = f[4]  # save the exercise list
             workoutid1 = f[0]
             break
 
     exercise = json.loads(exec_lst[0])
 
-    for e1 in exec_lst: #go over the exercises
+    for e1 in exec_lst:  # go over the exercises
         e = json.loads(e1)
-        if e["name"] == exercise_name: #find the specific exercise by name
-            exercise = e #save the exercise
+        if e["name"] == exercise_name:  # find the specific exercise by name
+            exercise = e  # save the exercise
             break
 
-    chosen_set = exercise["sets"][sets_index] #save the specific set in the exercise by index
-    exercise["sets"].remove(chosen_set) #delete the set from the exercise sets
+    chosen_set = exercise["sets"][sets_index]  # save the specific set in the exercise by index
+    exercise["sets"].remove(chosen_set)  # delete the set from the exercise sets
     n = 0
-    for i in exec_lst:# go over the exercises
+    for i in exec_lst:  # go over the exercises
         e = json.loads(i)
-        if e["name"] == exercise_name: #find the specific exercise by name
+        if e["name"] == exercise_name:  # find the specific exercise by name
             # i = json.dumps(exercise) #change the specific exercise
             exec_lst[n] = json.dumps(exercise)
             break
@@ -541,6 +546,7 @@ def deletesetfromexercise(userid: str, date: datetime, workout_name: str, exerci
     session.commit()
     return {"response": "the set deleted"}
 
+
 @app.get("/updatesetinexercise")
 def updatesetinexercise(userid: str, date: datetime, workout_name: str, exercise_name: str, sets_index: int,
                         updated_set):
@@ -551,25 +557,25 @@ def updatesetinexercise(userid: str, date: datetime, workout_name: str, exercise
     workoutid1 = find[0][0]  # the workout id of the first workout
 
     for f in find:
-        if f[2] == workout_name: #find the specific workout by name
-            exec_lst = f[4] #save the exercise list
+        if f[2] == workout_name:  # find the specific workout by name
+            exec_lst = f[4]  # save the exercise list
             workoutid1 = f[0]
             break
 
     exercise = json.loads(exec_lst[0])
 
-    for e1 in exec_lst: #go over the exercises
+    for e1 in exec_lst:  # go over the exercises
         e = json.loads(e1)
-        if e["name"] == exercise_name: #find the specific exercise by name
-            exercise = e #save the exercise
+        if e["name"] == exercise_name:  # find the specific exercise by name
+            exercise = e  # save the exercise
             break
 
     exercise["sets"][sets_index] = json.loads(updated_set)
 
     n = 0
-    for i in exec_lst:# go over the exercises
+    for i in exec_lst:  # go over the exercises
         e = json.loads(i)
-        if e["name"] == exercise_name: #find the specific exercise by name
+        if e["name"] == exercise_name:  # find the specific exercise by name
             # i = json.dumps(exercise) #change the specific exercise
             exec_lst[n] = json.dumps(exercise)
             break
@@ -780,3 +786,66 @@ def bring_info(name: str):
         response = {"first_name": "0", "last_name": "0", "phone_num": "0", "age": 0,
                     "gender": "0", "goals": "0"}
     return response
+
+
+@app.get("/change_privacy")
+def change_privacy(name: str, public: bool) -> dict[str, str]:
+    session = Session()
+
+    find = session.query(user_table).filter(user_table.c.name == name).first()
+
+    if find is not None:
+        stmt = update(user_table).where(user_table.c.name == name).values(
+            public=public
+        )
+
+        session.execute(stmt)
+
+        session.commit()
+        return {"response": "the privacy changed"}
+
+    return {"response": "the user does not exist"}
+
+
+@app.get("/find_privacy")
+def find_privacy(userid: str) -> dict[str, str]:
+    session = Session()
+    find = session.query(user_table).filter(user_table.c.name == userid).first()
+    return {"response": str(find[9])}
+
+
+@app.get("/public_user_lst")
+def public_user_lst(userid: str) -> dict[str, list[Any]]:
+    session = Session()
+
+    find = session.query(user_table).filter(user_table.c.public == True).all()
+
+    username_public_lst = []
+
+    for i in find:
+        if i[0] != userid:
+            username_public_lst.append(i[0])
+
+    return {"response": username_public_lst}
+
+@app.get("/shareworkout")
+def shareworkout(userid: str, workout_name: str, date: datetime):
+    session = Session()
+
+    find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
+
+    for f in find:
+        if date == f[3] and workout_name == f[2]:
+            session.execute(
+                shared_workout_table.insert().values(
+                    userid=userid,
+                    workoutid=f[0]
+                )
+            )
+
+            session.commit()
+
+            return {"response": "share success"}
+
+    return {"response": "workout data not found"}
+
