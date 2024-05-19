@@ -28,6 +28,10 @@ class EditWorkout:
             options=self.return_workout_names(),
         )
 
+        self.button_select_workout = ft.ElevatedButton(text="change", on_click=self.change_workout_details_format,
+                                                          bgcolor='#E1F3F1',
+                                                          color='black')
+
         self.button_show_edit_workout = ft.ElevatedButton(text="change", on_click=self.change_workout_details_format, bgcolor='#E1F3F1',
                                          color='black')
 
@@ -83,6 +87,34 @@ class EditWorkout:
 
         self.button_edit_set = ft.ElevatedButton(text="edit", on_click=self.edit_set,
                                                  bgcolor='#E1F3F1', color='black')
+
+        self.select_workout_panel = ft.Row([
+            ft.Container(
+                margin=10,
+                padding=10,
+                alignment=ft.alignment.center,
+                content=ft.Row(
+                    controls=[
+                        ft.Column(
+                            [
+                                ft.Text("CHOOSE THE WORKOUT YOU WANT TO EDIT-", size=45, color='#8532B8',
+                                        weight=ft.FontWeight.W_500,
+                                        selectable=True,
+                                        font_family="Century Gothic"),
+                                ft.Row(
+                                    [
+                                        ft.Text("in the date- " + self.str_date, size=25, color='#0A54B6',
+                                                weight=ft.FontWeight.W_500,
+                                                selectable=True, font_family="Century Gothic"),
+                                    ]
+                                ),
+                                ft.Row([self.lst_name_workout, self.massage]),
+                            ]
+                        )
+                    ]
+                )
+            )
+        ])
 
         self.edit_panel = ft.Row([
             ft.Container(
@@ -155,6 +187,33 @@ class EditWorkout:
             self.page.update()
 
         else:
+            self.edit_panel = ft.Row([
+                ft.Container(
+                    margin=10,
+                    padding=10,
+                    alignment=ft.alignment.center,
+                    content=ft.Row(
+                        controls=[
+                            ft.Column(
+                                [
+                                    ft.Text(f"THE WORKOUT YOU CHOSE TO EDIT- {workout_name}", size=45, color='#8532B8',
+                                            weight=ft.FontWeight.W_500,
+                                            selectable=True,
+                                            font_family="Century Gothic"),
+                                    ft.Row(
+                                        [
+                                            ft.Text("in the date- " + self.str_date, size=25, color='#0A54B6',
+                                                    weight=ft.FontWeight.W_500,
+                                                    selectable=True, font_family="Century Gothic"),
+                                        ]
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+                )
+            ])
+
             self.page.add(self.workout_name, self.button_date_to_change)
             self.page.add(self.massageD1)
             self.massage.value = ""
@@ -192,11 +251,36 @@ class EditWorkout:
 
             self.massage.value = response["response"]
             self.page.update()
-            self.lst_name_workout = ft.Dropdown(
-                options=self.return_workout_names(),
-            )
+
+            self.edit_panel = ft.Row([
+                ft.Container(
+                    margin=10,
+                    padding=10,
+                    alignment=ft.alignment.center,
+                    content=ft.Row(
+                        controls=[
+                            ft.Column(
+                                [
+                                    ft.Text(f"THE WORKOUT YOU CHOSE TO EDIT- {workout_name}", size=45, color='#8532B8',
+                                            weight=ft.FontWeight.W_500,
+                                            selectable=True,
+                                            font_family="Century Gothic"),
+                                    ft.Row(
+                                        [
+                                            ft.Text("in the date- " + self.str_date, size=25, color='#0A54B6',
+                                                    weight=ft.FontWeight.W_500,
+                                                    selectable=True, font_family="Century Gothic"),
+                                        ]
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+                )
+            ])
+
             self.page.clean()
-            self.page.add(self.edit_panel)
+            self.page.add(self.select_workout_panel)
             self.page.update()
 
 
@@ -377,7 +461,7 @@ class EditWorkout:
         self.page.horizontal_alignment = 'CENTER'
         self.page.vertical_alignment = 'CENTER'
 
-        self.page.bgcolor = ft.colors.GREY_100
+        self.page.bgcolor = "#E6E6E6"
         self.page.update()
 
 
@@ -781,7 +865,7 @@ class AddFullWorkout:
         self.page.horizontal_alignment = 'CENTER'
         self.page.vertical_alignment = 'CENTER'
 
-        self.page.bgcolor = ft.colors.GREY_100
+        self.page.bgcolor = "#E6E6E6"
         # self.page.add(ft.Column([self.first_panel]))
         self.page.update()
 
@@ -816,6 +900,12 @@ class ShowTheWorkout:
 
         self.button_share_workout = ft.ElevatedButton(text="share", on_click=self.share_workout, bgcolor='#8532B8',
                                                        color='white')
+
+        self.button_show_unshare_workout = ft.ElevatedButton(text="unshare workout", on_click=self.show_unshare_workout,
+                                                           bgcolor='#8532B8', color='white')
+
+        self.button_unshare_workout = ft.ElevatedButton(text="un share", on_click=self.unshare_workout, bgcolor='#8532B8',
+                                                      color='white')
 
     def date_workout(self):
         lst = []
@@ -857,12 +947,28 @@ class ShowTheWorkout:
         self.calndar_format()
 
 
-
     def show_share_workout(self, e: ft.ControlEvent):
-        lst = self.date_workout()
+        workouts_this_date_lst = self.date_workout()
+
+        shared_workouts = self.client.bring_shared_workoutid(chosed_user=self.client.username)["response"]
+
+
+        sign = False #the workout unshared
+        self.date_and_unshared = []
+
+        #find the unshare so the user could share them
+        for i in workouts_this_date_lst:
+            sign = False
+            for j in shared_workouts:
+                if i[0] == j:
+                    sign = True
+                    break
+
+            if sign == False:
+                self.date_and_unshared.append(i)
 
         lst_name_workout_dropdown = []
-        for i in lst:
+        for i in self.date_and_unshared:
             lst_name_workout_dropdown.append(ft.dropdown.Option(i[2]))
 
         self.lst_name_workout = ft.Dropdown(
@@ -890,6 +996,57 @@ class ShowTheWorkout:
         self.calndar_format()
 
 
+    def show_unshare_workout(self, e: ft.ControlEvent):
+        # the all workouts in this date
+        workouts_this_date_lst = self.date_workout()
+
+        # the all workouts the user shared (in the all dates)-> so I need to check if the dates match
+        shared_workouts = self.client.bring_shared_workoutid(chosed_user=self.client.username)["response"]
+
+
+        # find the shared workouts so the user could un share them
+        self.date_and_shared = []
+        for i in workouts_this_date_lst:
+            for j in shared_workouts:
+                if i[0] == j:
+                    self.date_and_shared.append(i)
+
+
+        lst_name_workout_dropdown = []
+        for i in self.date_and_shared:
+            lst_name_workout_dropdown.append(ft.dropdown.Option(i[2]))
+
+        self.lst_name_workout2 = ft.Dropdown(
+            options=lst_name_workout_dropdown,
+        )
+
+        self.unshare_fomate = ft.Column([
+            ft.Text("choose the workout you want to un share- ", size=35, color='#8532B8', weight=ft.FontWeight.W_500,
+                    selectable=True,
+                    font_family="Elephant"),
+
+            self.lst_name_workout2,
+
+            self.button_unshare_workout
+        ])
+
+        # self.page.clean()
+        self.page.add(ft.Row([self.unshare_fomate]))
+        self.page.update()
+
+    def unshare_workout(self, e: ft.ControlEvent):
+        workout_name = self.lst_name_workout2.value
+
+        workout_id_to_unshare = -1
+        for i in self.date_and_shared:
+            if workout_name == i[2]:
+                workout_id_to_unshare = i[0]
+
+        response = self.client.unshareworkout(workout_id_to_unshare)
+        self.page.clean()
+        self.calndar_format()
+
+
 
     def check1(self):
         lst = self.date_workout()
@@ -905,7 +1062,11 @@ class ShowTheWorkout:
             final_lst = self.show_workout(lst)
             self.calndar_format()
             self.page.add(self.button_show_delete_workout)
-            self.page.add(self.button_show_share_workout)
+
+            if self.client.privacy:
+                self.page.add(self.button_show_share_workout)
+                self.page.add(self.button_show_unshare_workout)
+
             self.page.add(ft.Column(final_lst))
             self.page.update()
             # for i in final_lst:
@@ -915,7 +1076,18 @@ class ShowTheWorkout:
     def show_workout(self, lst):
         format_workout_lst = []
 
+        shared_workouts = []
+        if self.client.privacy:
+            shared_workouts = self.client.bring_shared_workoutid(chosed_user=self.client.username)["response"]
+
         for i in lst:
+            shared = "not shared"
+            if i[0] in shared_workouts:
+                shared = "shared"
+
+            if not self.client.privacy:
+                shared = ""
+
             temp = ft.Container(
                 margin=10,
                 padding=10,
@@ -931,9 +1103,11 @@ class ShowTheWorkout:
                                         weight=ft.FontWeight.W_500, selectable=True, font_family="Elephant",
                                         text_align=ft.alignment.center),
 
-                                ft.Text("date- " + str(i[3]), size=20, color=ft.colors.PURPLE,
+                                ft.Text("date- " + str(datetime.strptime(i[3], '%Y-%m-%dT%H:%M:%S').strftime('%Y-%m-%d')), size=20, color=ft.colors.PURPLE,
                                         weight=ft.FontWeight.W_500, selectable=True, font_family="Elephant",
                                         text_align=ft.alignment.center),
+
+                                ft.Text(shared)
                                 # ft.ElevatedButton(text="X",value= i[2] ,on_click=self.delete_workout(i[2], i[3]), bgcolor='#8532B8',
                                 #                                                color='white'),
 
@@ -1048,7 +1222,7 @@ class ShowTheWorkout:
     def main(self, page: ft.Page) -> None:
         self.page = page
         self.page.scroll = ft.ScrollMode.ALWAYS
-        self.page.bgcolor = ft.colors.GREY_100
+        self.page.bgcolor = "#E6E6E6"
         self.check1()
         self.page.update()
 
@@ -1425,8 +1599,7 @@ class CalendarApp:
     def main(page: ft.Page, client: Client):
         client1 = client
         # page.theme_mode = ft.ThemeMode.DARK
-        # page.bgcolor = "1f2128"
-        page.bgcolor = ft.colors.GREY_100
+        page.bgcolor = "#EDE3EA"
 
         task_manager = CalendarApp.TaskManager(client=client1)
         grid = CalendarApp.DateGrid(

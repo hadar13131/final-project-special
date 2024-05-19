@@ -10,6 +10,9 @@ from project.client import Client
 # from login_signup import SignUpPage
 import login_signup
 import welcome_page
+import profile_page
+import menu_page
+
 
 class DeleteUserPage:
     def __init__(self, client: Client) -> None:
@@ -21,21 +24,57 @@ class DeleteUserPage:
         self.username3 = ft.TextField(label="User Name", autofocus=True, border_color='#8532B8')
         self.password3 = ft.TextField(label="Password", autofocus=True, password=True, can_reveal_password=True,
                                       border_color='#8532B8')
-        self.button3 = ft.ElevatedButton(text="Delete", on_click=self.click3, bgcolor='#8532B8', color='white')
+        self.button_delete = ft.ElevatedButton(text="Delete", on_click=self.click3, bgcolor='#8532B8', color='white')
         self.massageD3 = ft.TextField(read_only=True, border="none", color='#A8468C')
 
+        self.button_Back = ft.ElevatedButton(text="BACK", on_click=self.back_to_profile, bgcolor='#CC99FF',
+                                             color='black')
+
         self.main_panel_delete = ft.Column(
-            [
-                self.text3,
-                self.username3,
-                self.password3,
-                self.button3,
-                self.massageD3
+            alignment=ft.alignment.top_left,
+            controls=[
+                self.button_Back,
+                ft.Column(
+                    alignment=ft.alignment.center,
+                    controls=[
+                        ft.Text("DELETE-", size=40, color=ft.colors.BLACK,
+                                weight=ft.FontWeight.W_500,
+                                selectable=True, font_family="Century Gothic"),
+                        ft.Text(""),
+
+                        ft.Text("Are you sure you want to delete your user?", size=25, color=ft.colors.BLACK,
+                                weight=ft.FontWeight.W_500,
+                                selectable=True, font_family="Century Gothic"),
+
+                        ft.Text("all of your information will delete...", size=20, color=ft.colors.BLACK,
+                                weight=ft.FontWeight.W_500,
+                                selectable=True,
+                                font_family="Century Gothic"),
+
+                    ]
+                ),
+                ft.Container(
+                    margin=20,
+                    padding=20,
+                    alignment=ft.alignment.center,
+                    bgcolor=ft.colors.WHITE,
+                    border_radius=10,
+                    # border=ft.border.all(30, '#E1F3F1'),
+                    content=ft.Column([
+                        self.username3,
+                        self.password3,
+                        self.button_delete,
+                        self.massageD3
+                    ])
+                ),
+
             ]
-            # ,
-            # scroll=ft.ScrollMode.ALWAYS,
-            # height=100
         )
+
+    def back_to_profile(self, e: ft.ControlEvent) -> None:
+        self.page.clean()
+        app_instance = menu_page.MenuApp(client=self.client)
+        app_instance.main(self.page)
 
     def click3(self, e: ft.ControlEvent) -> None:
         username = self.username3.value
@@ -95,6 +134,7 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 
+
 class SignOutPage:
     def __init__(self, client: Client) -> None:
         self.page = None
@@ -108,8 +148,12 @@ class SignOutPage:
         self.button3 = ft.ElevatedButton(text="signout", on_click=self.click3, bgcolor='#8532B8', color='white')
         self.massageD3 = ft.TextField(read_only=True, border="none", color='#A8468C')
 
+        self.button_Back = ft.ElevatedButton(text="BACK", on_click=self.back_to_profile, bgcolor='#CC99FF',
+                                             color='black')
+
         self.main_panel_signout = ft.Column(
             [
+                self.button_Back,
                 self.text3,
                 self.username3,
                 self.password3,
@@ -120,6 +164,11 @@ class SignOutPage:
             # scroll=ft.ScrollMode.ALWAYS,
             # height=100
         )
+
+    def back_to_profile(self, e: ft.ControlEvent) -> None:
+        self.page.clean()
+        app_instance = menu_page.MenuApp(client=self.client)
+        app_instance.main(self.page)
 
     def click3(self, e: ft.ControlEvent) -> None:
         username = self.username3.value

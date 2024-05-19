@@ -193,6 +193,9 @@ def delete(name: str, password: str) -> dict[str, str]:
 
             session.commit()
 
+            #delete the all user shared workouts in the table of the shared workouts
+            response = delete_shared_workouts(chosed_user=name)
+
             find = session.query(workout_table).filter(workout_table.c.userid == name).all()
             for workuot in find:
                 session.execute(
@@ -202,6 +205,7 @@ def delete(name: str, password: str) -> dict[str, str]:
                 )
 
             session.commit()
+
             return {"response": "delete success"}
 
     return {"response": "user data not found"}
@@ -301,12 +305,23 @@ def deleteworkout(userid: str, workout_name: str, date: datetime):
 
     find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
 
+    lst_shared_workouts = bring_shared_workoutid(chosed_user=userid)["response"]
+
     for f in find:
         if date == f[3] and workout_name == f[2]:
+            for i in lst_shared_workouts:
+                if f[0] == i:
+                    session.execute(
+                        shared_workout_table.delete().where(
+                            shared_workout_table.c.workoutid == i
+                        )
+                    )
+                    session.commit()
+
+
             session.execute(
                 workout_table.delete().where(
-                    workout_table.c.workout_name == workout_name and
-                    workout_table.c.date == date
+                    workout_table.c.workout_name == workout_name and workout_table.c.date == date
                 )
             )
 
@@ -802,16 +817,20 @@ def change_privacy(name: str, public: bool) -> dict[str, str]:
         session.execute(stmt)
 
         session.commit()
+
+        if not public:
+            response = delete_shared_workouts(chosed_user=name)
+
         return {"response": "the privacy changed"}
 
     return {"response": "the user does not exist"}
 
 
 @app.get("/find_privacy")
-def find_privacy(userid: str) -> dict[str, str]:
+def find_privacy(userid: str) -> dict[str, bool]:
     session = Session()
     find = session.query(user_table).filter(user_table.c.name == userid).first()
-    return {"response": str(find[9])}
+    return {"response": find[9]}
 
 
 @app.get("/public_user_lst")
@@ -849,6 +868,24 @@ def shareworkout(userid: str, workout_name: str, date: datetime):
 
     return {"response": "workout data not found"}
 
+@app.get("/unshareworkout")
+def unshareworkout(workoutid: int):
+    session = Session()
+
+    find = session.query(shared_workout_table).filter(shared_workout_table.c.workoutid == workoutid).first()
+
+    if find:
+        session.execute(
+            shared_workout_table.delete().where(
+                shared_workout_table.c.workoutid == workoutid
+            )
+        )
+        session.commit()
+
+        return {"response": "un share success"}
+
+    return {"response": "workout data not found"}
+
 @app.get("/bring_shared_workoutid")
 def bring_shared_workoutid(chosed_user: str):
     session = Session()
@@ -860,4 +897,31 @@ def bring_shared_workoutid(chosed_user: str):
         workoutid_lst.append(f[2])
 
     return {"response": workoutid_lst}
+
+@app.get("/full_workout_by_workoutid")
+def full_workout_by_workoutid(workoutid: str) -> dict[str, tuple]:
+    session = Session()
+    # find = []
+    find = session.query(workout_table).filter(workout_table.c.workoutid == workoutid).first()
+    # return find
+    # return json.dumps(find)
+    return {"response": find}
+
+
+@app.get("/delete_shared_workouts")
+def delete_shared_workouts(chosed_user: str):
+    session = Session()
+
+    find = session.query(shared_workout_table).filter(shared_workout_table.c.userid == chosed_user).all()
+
+    session.execute(
+        shared_workout_table.delete().where(
+            shared_workout_table.c.userid == chosed_user
+        )
+    )
+
+    session.commit()
+
+    return {"response": "delete success"}
+
 
