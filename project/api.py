@@ -333,7 +333,7 @@ def deleteworkout(userid: str, workout_name: str, date: datetime):
 
 
 @app.get("/updateworkout")
-def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_name: str, new_date: datetime):
+def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_name, new_date):
     session = Session()
 
     find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
@@ -342,8 +342,9 @@ def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_na
         if date == f[3] and workout_name == f[2]:
             workoutid1 = f[0]
             if new_workout_name != "" and new_date != "":
+                date1 = datetime.strptime(new_date, '%Y-%m-%d %H:%M:%S')
                 stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(
-                    workout_name=new_workout_name, date=new_date
+                    workout_name=new_workout_name, date=date1
                 )
                 session.execute(stmt)
                 session.commit()
@@ -351,7 +352,8 @@ def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_na
 
 
             elif new_workout_name == "" and new_date != "":
-                stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(date=new_date)
+                date1 = datetime.strptime(new_date, '%Y-%m-%d %H:%M:%S')
+                stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(date=date1)
                 session.execute(stmt)
                 session.commit()
                 return {"response": "update success"}
@@ -409,28 +411,93 @@ def addexercisetoworkout(userid: str, date: str, workout_name: str, exercise):
 # delete exercise to exist workout
 # **to change that it will be by workout id and current userid
 @app.get("/deletexercisefromworkout")
-def deletexercisefromworkout(userid: str, date, workout_name: str, exercise_name: str):
+def deletexercisefromworkout(userid: str, date: datetime, workout_name: str, exercise_name: str):
     session = Session()
-    find = session.query(workout_table).filter(workout_table.c.userid == userid).first()
+    find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
+    workoutid1 = find[0][0]
+    workout = find[0]
 
-    exec_list = [find[3]]
-    exec_to_check = exercise_name  # Set to check
-    exists = False
-    for e in exec_list:
-        if e == exec_to_check:
-            exists = True
+    sign = False
+
+    for f in find:
+        if date == f[3] and workout_name == f[2]:
+            workoutid1 = f[0]
+            workout = f
+            sign = True
             break
 
-    if exists:
-        exec_list.remove(exec_to_check)
-        stmt = update(workout_table).where(workout_table.c.userid == "hadar44").values(exerciselist=exec_list)
+    exercise_lst = workout[4]
+    if sign:
+        for e in exercise_lst:
+            exercise = json.loads(e)
+            if exercise["name"] == exercise_name:
+                exercise_lst.remove(e)
+                stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(exerciselist=exercise_lst)
+                session.execute(stmt)
+                session.commit()
+                return {"response": "delete success"}
+
+    return {"response": "the exercise data exists"}
+
+@app.get("/updateexercise")
+def updateexercise(userid: str, workout_name: str, date: datetime, exercise_name, power, new_exercise_name, new_power):
+    session = Session()
+
+    find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
+    workoutid1 = find[0][0]
+    workout= find[0]
+
+    for f in find:
+        if date == f[3] and workout_name == f[2]:
+            workoutid1 = f[0]
+            workout = f
+            break
+
+    exercise_lst = workout[4]
+    sets = json.loads(exercise_lst[0])["sets"]
+
+    for e in exercise_lst:
+        exercise = json.loads(e)
+        if exercise["name"] == exercise_name:
+            sets = exercise["sets"]
+            exercise_lst.remove(e)
+            break
+
+    obj_set_lst = []
+    for i in sets:
+        obj_set_lst.append(Set.load(i))
+
+    if new_exercise_name != "" and new_power != "":
+        new_exec = Exercise(name=new_exercise_name, power=new_power, sets=obj_set_lst)
+        new_exec2 = json.dumps(new_exec.dump())
+        exercise_lst.append(new_exec2)
+        stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(
+            exerciselist=exercise_lst)
         session.execute(stmt)
         session.commit()
-        return {"response": "the exercise deleted"}
+        return {"response": "update success"}
 
-    else:
-        return {"response": "the exercise doesnt found"}
+    elif new_exercise_name == "" and new_power != "":
+        new_exec = Exercise(name=exercise_name, power=new_power, sets=obj_set_lst)
+        new_exec2 = json.dumps(new_exec.dump())
+        exercise_lst.append(new_exec2)
+        stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(
+            exerciselist=exercise_lst)
+        session.execute(stmt)
+        session.commit()
+        return {"response": "update success"}
 
+    elif new_exercise_name != "" and new_power == "":
+        new_exec = Exercise(name=new_exercise_name, power=power, sets=obj_set_lst)
+        new_exec2 = json.dumps(new_exec.dump())
+        exercise_lst.append(new_exec2)
+        stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(
+            exerciselist=exercise_lst)
+        session.execute(stmt)
+        session.commit()
+        return {"response": "update success"}
+
+    return {"response": "nothing changed"}
 
 @app.get("/addsettoexercise2")
 def addsettoexercise2(userid: str, date: str, workout_name: str, exercise_name: str, power: str, sets):

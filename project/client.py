@@ -179,7 +179,22 @@ class Client:
             f"{self.server_address}/deletexercisefromworkout",
             params=credentials
         )
+
+        self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
         return response.json()
+
+    def updateexercise(self, userid, date, workout_name, exercise_name, power, new_exercise_name, new_power):
+        credentials = dict(userid=userid, date=date, workout_name=workout_name, exercise_name=exercise_name, power=power,
+                           new_exercise_name=new_exercise_name, new_power=new_power)
+
+        response = requests.get(
+            f"{self.server_address}/updateexercise",
+            params=credentials
+        )
+
+        self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
+        return response.json()
+
 
     def addsettoexercise(self, userid, date, workout_name, exercise, sets):
         credentials = dict(userid=userid, date=date, workout_name=workout_name, exercise=exercise, sets=sets)

@@ -1,15 +1,8 @@
-from project.models import Set, Exercise, Workout
 import json
-
-import calendar
-from datetime import datetime
-
 import flet as ft
-import calendar
 from datetime import datetime
 from project.client import Client
 
-import project.check_errors as c_e
 
 class SharePage:
     def __init__(self, client: Client) -> None:
@@ -60,8 +53,13 @@ class SharePage:
         self.search_user.close_view(text)
         self.selected_user = e.control.data
 
-        self.show_user_info()
-        self.show_user_workouts()
+        row1 = self.show_user_info()
+        row2 = self.show_user_workouts()
+
+        self.page.add(ft.Column([ft.Row([row1]), row2]))
+
+        # self.page.add(ft.Column(alignment=ft.MainAxisAlignment.START, controls=[row1]))
+        # self.page.add(ft.Column(alignment=ft.MainAxisAlignment.END, controls=[row2]))
 
         self.page.update()
 
@@ -76,6 +74,7 @@ class SharePage:
             border=ft.border.all(5, '#BB77F9'),
             content=ft.Column(
                 width=600,
+                alignment=ft.MainAxisAlignment.START,
                 controls=[
                     ft.Column([
                         ft.Text(f"{self.selected_user} profile details-", size=30, color='#0E2841',
@@ -112,9 +111,11 @@ class SharePage:
         row_container.main_alignment = ft.MainAxisAlignment.CENTER
 
         row_container.width = 600
-        self.page.add(ft.Row([row_container]))
+        # self.page.add(ft.Row([row_container]))
 
         self.page.update()
+
+        return row_container
 
     def show_user_workouts(self) -> None:
         workoutid_lst = self.client.bring_shared_workoutid(chosed_user=self.selected_user)["response"]
@@ -133,14 +134,18 @@ class SharePage:
             sorted_workout_lst = sorted(lst_workout, key=lambda x: x[3])
 
             self.full_workout_formate = self.show_workout(sorted_workout_lst)
-            self.page.add(
-                    ft.Column(
+            # self.page.add(
+            #         ft.Column(
+            #             alignment=ft.MainAxisAlignment.START,
+            #             controls=self.full_workout_formate
+            #         ))
+
+            self.page.update()
+            row2 = ft.Column(
                         alignment=ft.MainAxisAlignment.START,
                         controls=self.full_workout_formate
-                    ))
-            # self.page.add(self.full_workout_formate)
-            self.page.update()
-
+                    )
+            return row2
 
     #build the workout formate
     def show_workout(self, lst):

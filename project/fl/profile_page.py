@@ -20,6 +20,9 @@ class Profile_Page:
 
         self.workout_table = self.return_workout_table()
 
+        self.button_Back = ft.ElevatedButton(text="BACK", on_click=self.back_to_profile, bgcolor='#B9DCFF',
+                                             color='black')
+
         self.button_show_info = ft.ElevatedButton(text="show my profile details", on_click=self.show_your_info,
                                                   bgcolor='#8532B8', color='white')
 
@@ -48,6 +51,7 @@ class Profile_Page:
 
         self.button1 = ft.ElevatedButton(text="change", on_click=self.change_your_info, bgcolor='#8532B8', color='white')
 
+
         self.public = ft.CupertinoSwitch(
             label="Public Account",
             on_change=self.change_privacy,
@@ -64,6 +68,7 @@ class Profile_Page:
                              content=ft.Column(
                                  width=600,
                                  controls=[
+                                     self.button_Back,
                                      ft.Column([
                                          ft.Text("Your Details-", size=30, color='#8532B8',
                                                  weight=ft.FontWeight.W_500,
@@ -89,6 +94,8 @@ class Profile_Page:
                                          self.age,
                                          self.gender,
                                          self.goals,
+                                         ft.Text("**if you will switch to un public, all of your shared posts will be un shared",
+                                                 color=ft.colors.RED),
                                          self.public,
                                          self.button1,
                                          self.massageE
@@ -237,18 +244,10 @@ class Profile_Page:
 
                         )])
 
-        # self.veiw3 = ft.Container(
-        #         margin=10,
-        #         padding=10,
-        #         # alignment=ft.alignment.center,
-        #         # bgcolor='#CC99FF',
-        #         # border_radius=10,
-        #         # border=ft.border.all(3, '#8532B8'),
-        #         content=self.count_workouts,
-        #             alignment=ft.alignment.top_right
-        #
-        #
-        #     )
+
+    def back_to_profile(self, e: ft.ControlEvent) -> None:
+        self.page.clean()
+        self.main(self.page)
 
     def change_privacy(self, e: ft.ControlEvent):
         public = self.public.value
@@ -457,8 +456,6 @@ class Profile_Page:
                 n = n + 1
 
         return n
-
-
 
 
     def main(self, page: ft.Page) -> None:

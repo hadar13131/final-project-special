@@ -33,9 +33,9 @@ class ShowImproveGraps:
         self.button1 = ft.ElevatedButton(text="send", on_click=self.show_graph1_on_click, bgcolor='#8532B8',
                                          color='white')
 
-        self.massageD1 = ft.TextField(read_only=True, border="none", color=ft.colors.BLACK)
-        self.massageD2 = ft.TextField(read_only=True, border="none", color=ft.colors.BLACK)
-        self.errorM = ft.TextField(read_only=True, border="none", color=ft.colors.BLACK, border_width=50)
+        self.massageD1 = ft.TextField(read_only=True, border="none", width=150, color=ft.colors.BLACK)
+        self.massageD2 = ft.TextField(read_only=True, border="none", width=150, color=ft.colors.BLACK)
+        self.errorM = ft.TextField(read_only=True, border="none", color=ft.colors.BLACK)
 
         self.s_date = ""
         self.e_date = ""
@@ -175,7 +175,7 @@ class ShowImproveGraps:
 
         if self.exercise_name2 and s_date and e_date:
             if s_date > e_date:
-                self.errorM.value = "the stat day should be before \n the end day!"
+                self.errorM.value = "the start day comes before the end day"
                 self.page.update()
 
             else:
@@ -188,7 +188,7 @@ class ShowImproveGraps:
                 self.avgdistance_KM_l = response["distance_KM_avg"]
 
                 if not self.dates_l:
-                    self.errorM.value = f"there is no {self.exercise_name2} exercise between the days you picked"
+                    self.errorM.value = f"the exercise doesnt exist between this days"
                     self.page.update()
 
                 else:

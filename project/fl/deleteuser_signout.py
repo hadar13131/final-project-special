@@ -61,10 +61,9 @@ class DeleteUserPage:
                     border_radius=10,
                     # border=ft.border.all(30, '#E1F3F1'),
                     content=ft.Column([
-                        self.username3,
-                        self.password3,
-                        self.button_delete,
-                        self.massageD3
+                        ft.Row([self.username3]),
+                        ft.Row([self.password3]),
+                        ft.Row([self.button_delete, self.massageD3]),
                     ])
                 ),
 
@@ -79,18 +78,21 @@ class DeleteUserPage:
     def click3(self, e: ft.ControlEvent) -> None:
         username = self.username3.value
         password = self.password3.value
-        password = hashlib.sha256(password.encode()).hexdigest()
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         self.username3.error_text = ""
         self.password3.error_text = ""
 
         if username and password:
-            response = self.client.delete(username, password)
+            response = self.client.delete(username, hashed_password)
             self.massageD3.value = response["response"]
-            self.client = Client()
-            self.page.clean()
-            app_instance = welcome_page.First_page()
-            app_instance.main(self.page)
+            if "delete success" == self.massageD3.value:
+                self.client = Client()
+                self.page.clean()
+                app_instance = welcome_page.First_page()
+                app_instance.main(self.page)
+            else:
+                self.page.update()
 
             # app_instance = login_signup.SignUpPage()
             # app_instance.main(self.page)
@@ -120,7 +122,7 @@ class DeleteUserPage:
         row_container.main_alignment = ft.MainAxisAlignment.CENTER
 
         row_container.width = 650
-        self.page.add(self.main_panel_delete)
+        self.page.add(ft.Column([self.main_panel_delete]))
 
         self.page.horizontal_alignment = 'CENTER'
         self.page.vertical_alignment = 'CENTER'
@@ -165,6 +167,38 @@ class SignOutPage:
             # height=100
         )
 
+        self.main_panel_signout = ft.Column(
+            alignment=ft.alignment.center,
+            controls=[
+                self.button_Back,
+                        ft.Column(
+                            alignment=ft.alignment.center,
+                            controls=[
+                        ft.Text("signout", size=55, color='#8532B8', weight=ft.FontWeight.W_500, selectable=True,
+                                font_family="Elephant", text_align=ft.alignment.center),
+
+                        ft.Container(
+                            margin=20,
+                            padding=20,
+                            alignment=ft.alignment.center,
+                            bgcolor=ft.colors.WHITE,
+                            border_radius=10,
+                            # border=ft.border.all(30, '#E1F3F1'),
+                            content=ft.Column(
+                                alignment=ft.alignment.center,
+                                controls=[
+                                    self.username3,
+                                    self.password3,
+                                    self.button3,
+                                    self.massageD3
+                            ])
+                        ),
+                        ])
+
+
+            ]
+        )
+
     def back_to_profile(self, e: ft.ControlEvent) -> None:
         self.page.clean()
         app_instance = menu_page.MenuApp(client=self.client)
@@ -173,13 +207,13 @@ class SignOutPage:
     def click3(self, e: ft.ControlEvent) -> None:
         username = self.username3.value
         password = self.password3.value
-        password = hashlib.sha256(password.encode()).hexdigest()
+        hashed_password = hashlib.sha256(password.encode()).hexdigest()
 
         self.username3.error_text = ""
         self.password3.error_text = ""
 
         if username and password:
-            response = self.client.signout(username, password)
+            response = self.client.signout(username, hashed_password)
             self.massageD3.value = response["response"]
             self.page.update()
 
@@ -206,11 +240,11 @@ class SignOutPage:
         self.page = page
         self.page.scroll = ft.ScrollMode.ALWAYS
 
-        row_container = ft.Row([self.main_panel_signout], auto_scroll=True)
-        row_container.main_alignment = ft.MainAxisAlignment.CENTER
-
-        row_container.width = 650
-        self.page.add(self.main_panel_signout)
+        # row_container = ft.Row([self.main_panel_signout], auto_scroll=True)
+        # row_container.main_alignment = ft.MainAxisAlignment.CENTER
+        #
+        # row_container.width = 650
+        self.page.add(ft.Column([self.main_panel_signout]))
 
         self.page.horizontal_alignment = 'CENTER'
         self.page.vertical_alignment = 'CENTER'

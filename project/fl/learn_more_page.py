@@ -15,6 +15,14 @@ class LearnMorePage:
         self.button_Back = ft.ElevatedButton(text="BACK", on_click=self.back_to_welcome, bgcolor='#8532B8',
                                              color='white')
 
+        self.main_text = ft.Text(
+            f"POWER APP is a training application, where you can \nPLAN, EDIT and SEE your progress over time. \n\n"
+            f"In addition, you will be able to SHARE your selected workouts \nwith other users, "
+            f"and you will also be able \nto see theirs!",
+            size=30, color="#99CCFF", weight=ft.FontWeight.W_500,
+            font_family="Aharoni"
+        )
+
         self.learn_more_panel = ft.Column(
             [
                 self.text1,
@@ -27,22 +35,13 @@ class LearnMorePage:
         self.learn_more_panel = ft.Column(
             # width=600,
             controls=[
-                ft.Container(
-                    margin=10,
-                    padding=10,
-                    alignment=ft.alignment.center,
-                    bgcolor='#CC99FF',
-                    content=ft.Column(
-                        [
-                            self.text1,
-                            self.m1,
-                            self.m2,
-                            self.button_Back
-                        ]
-                    )
-                )
-            ],
+                self.button_Back,
+                ft.Text("ABOUT US", size=60, color='#8532B8', weight=ft.FontWeight.W_500,
+                        selectable=True, font_family="Elephant"),
+                self.main_text,
+            ]
         )
+
 
     def back_to_welcome(self, e: ft.ControlEvent) -> None:
         self.page.clean()
