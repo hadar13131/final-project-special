@@ -170,6 +170,8 @@ class EditWorkout:
         )
         self.massageD1 = ft.TextField(value=self.str_date, read_only=True, border="none", color='#A8468C')
 
+
+
     def calndar_format(self):
         task_manager = CalendarApp.TaskManager(client=self.client)
         grid = CalendarApp.DateGrid(
@@ -1508,6 +1510,14 @@ class ShowTheWorkout:
                                                         bgcolor='#8532B8',
                                                         color='white')
 
+        self.button_back_calendar = ft.ElevatedButton(text="Back", on_click=self.back_to_calendar,
+                                                      bgcolor='#8532B8',
+                                                      color='white')
+
+    def back_to_calendar(self, e: ft.ControlEvent):
+        self.page.clean()
+        self.calndar_format()
+
     def date_workout(self):
         lst = []
         for index in range(len(self.workout_lst)):
@@ -1537,8 +1547,8 @@ class ShowTheWorkout:
             self.button_delete_workout
         ])
 
-        # self.page.clean()
-        self.page.add(ft.Row([self.delete_fomat]))
+        self.page.clean()
+        self.page.add(ft.Column([self.button_back_calendar, self.delete_fomat]))
         self.page.update()
 
 
@@ -1585,8 +1595,8 @@ class ShowTheWorkout:
             self.button_share_workout
         ])
 
-        # self.page.clean()
-        self.page.add(ft.Row([self.share_fomate]))
+        self.page.clean()
+        self.page.add(ft.Column([self.button_back_calendar, self.share_fomate]))
         self.page.update()
 
     def share_workout(self, e: ft.ControlEvent):
@@ -1627,9 +1637,11 @@ class ShowTheWorkout:
             self.button_unshare_workout
         ])
 
-        # self.page.clean()
-        self.page.add(ft.Row([self.unshare_fomate]))
+
+        self.page.clean()
+        self.page.add(ft.Column([self.button_back_calendar, self.unshare_fomate]))
         self.page.update()
+
 
     def unshare_workout(self, e: ft.ControlEvent):
         workout_name = self.lst_name_workout2.value

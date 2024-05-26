@@ -9,7 +9,7 @@ import show_improvement
 import add_workout
 import profile_page
 import share_page
-import edit_try
+
 
 
 import login_signup
