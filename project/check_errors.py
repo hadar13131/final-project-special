@@ -20,6 +20,10 @@ def is_numeric(value):
 def check_workoutname(client: Client, workout_name, date) -> bool:
     workoutlst = client.user_workout_lst
 
+    # in case of edit workout when the user doesnt want to change the name of the workout
+    if workout_name == "":
+        return True
+
     for i in workoutlst:
         date1 = datetime.strptime(i[3], '%Y-%m-%dT%H:%M:%S')
         if date1 == date:
@@ -31,6 +35,10 @@ def check_workoutname(client: Client, workout_name, date) -> bool:
 
 def check_exercisename(client: Client, workout_name, date, exercise_name) -> bool:
     workoutlst = client.user_workout_lst
+
+    # in case of edit workout when the user doesnt want to change the name of the exercise
+    if exercise_name == "":
+        return True
 
     if not workoutlst:
         return True

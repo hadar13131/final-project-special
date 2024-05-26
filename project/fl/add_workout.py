@@ -304,7 +304,21 @@ class EditWorkout:
         self.old_date = self.first_date
         self.new_date = self.date_to_change  # new date
 
-        if not self.new_date and not self.new_workout_name:
+        # check if the workout name is valid in the new date
+        if self.new_date and self.new_workout_name and not c_e.check_workoutname(self.client, self.new_workout_name, self.new_date):
+                self.massage.value = "the name of the workout not valid"
+                self.page.update()
+
+        elif self.new_date and not self.new_workout_name and not c_e.check_workoutname(self.client, self.old_workout_name, self.new_date):
+                self.massage.value = "the name of the workout not valid"
+                self.page.update()
+
+        elif not self.new_date and self.new_workout_name and not c_e.check_workoutname(self.client, self.new_workout_name, self.old_date):
+                self.massage.value = "the name of the workout not valid"
+                self.page.update()
+
+
+        elif not self.new_date and not self.new_workout_name:
             self.massage.value = "there is no changes"
             self.page.update()
 
@@ -497,6 +511,10 @@ class EditWorkout:
 
         if not self.new_exercise_name and not self.new_power:
             self.massage.value = "there is no changes"
+            self.page.update()
+
+        if not c_e.check_exercisename(self.client, self.workoutname, self.first_date, self.new_exercise_name):
+            self.massage.value = "the exercise name is not valid"
             self.page.update()
 
         else:
@@ -1599,7 +1617,7 @@ class ShowTheWorkout:
             options=lst_name_workout_dropdown,
         )
 
-        self.unshare_fomate = ft.Column([
+        self.unshare_fomate = ft.Row([
             ft.Text("choose the workout you want to un share- ", size=35, color='#8532B8', weight=ft.FontWeight.W_500,
                     selectable=True,
                     font_family="Elephant"),

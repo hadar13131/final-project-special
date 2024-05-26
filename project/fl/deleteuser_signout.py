@@ -31,7 +31,7 @@ class DeleteUserPage:
                                              color='black')
 
         self.main_panel_delete = ft.Column(
-            alignment=ft.alignment.top_left,
+            alignment=ft.alignment.center_left,
             controls=[
                 self.button_Back,
                 ft.Column(
@@ -153,19 +153,6 @@ class SignOutPage:
         self.button_Back = ft.ElevatedButton(text="BACK", on_click=self.back_to_profile, bgcolor='#CC99FF',
                                              color='black')
 
-        self.main_panel_signout = ft.Column(
-            [
-                self.button_Back,
-                self.text3,
-                self.username3,
-                self.password3,
-                self.button3,
-                self.massageD3
-            ]
-            # ,
-            # scroll=ft.ScrollMode.ALWAYS,
-            # height=100
-        )
 
         self.main_panel_signout = ft.Column(
             alignment=ft.alignment.center,
@@ -240,10 +227,10 @@ class SignOutPage:
         self.page = page
         self.page.scroll = ft.ScrollMode.ALWAYS
 
-        # row_container = ft.Row([self.main_panel_signout], auto_scroll=True)
-        # row_container.main_alignment = ft.MainAxisAlignment.CENTER
-        #
-        # row_container.width = 650
+        row_container = ft.Row([self.main_panel_signout], auto_scroll=True)
+        row_container.main_alignment = ft.MainAxisAlignment.CENTER
+
+        row_container.width = 650
         self.page.add(ft.Column([self.main_panel_signout]))
 
         self.page.horizontal_alignment = 'CENTER'

@@ -9,6 +9,7 @@ import show_improvement
 import add_workout
 import profile_page
 import share_page
+import edit_try
 
 
 import login_signup
@@ -110,9 +111,9 @@ class MenuApp:
                 ft.Text(datetime.now().strftime("%x")),
                 ft.PopupMenuButton(
                     items=[
-                        ft.PopupMenuItem(text="delete my user", on_click=self.handel_delete_user),
+                        ft.PopupMenuItem(text="sign out", on_click=self.handel_signout_user, icon=ft.icons.LOGIN_OUTLINED),
                         ft.PopupMenuItem(),  # divider
-                        ft.PopupMenuItem(text="sign out", on_click=self.handel_signout_user),
+                        ft.PopupMenuItem(text="delete my user", on_click=self.handel_delete_user,icon=ft.icons.DELETE_OUTLINED),
                     ]
                 ),
             ],

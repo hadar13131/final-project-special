@@ -197,7 +197,7 @@ def delete(name: str, password: str) -> dict[str, str]:
             response = delete_shared_workouts(chosed_user=name)
 
             find = session.query(workout_table).filter(workout_table.c.userid == name).all()
-            for workuot in find:
+            for workuot in find: #delete all of his workouts
                 session.execute(
                     workout_table.delete().where(
                         workout_table.c.workoutid == workuot[0]
@@ -260,7 +260,7 @@ def check_email(email: str) -> dict[str, str]:
     users = session.execute(user_table.select())
 
     for user in users:
-        # Check if the username and password match
+        # Check if the email is existing - email should be unique
         if user.email == email:
             return {"response": "the email not valid, try to login"}
 
@@ -273,6 +273,8 @@ def check_email(email: str) -> dict[str, str]:
 @app.get("/addworkout")
 def addworkout(userid: str, workout_name: str, date: datetime, exerciselist: str = None):
     session = Session()
+
+    # at the beginning only the name and the date of the workout insert to the table
 
     if exerciselist != "":
         session.execute(
@@ -302,15 +304,19 @@ def addworkout(userid: str, workout_name: str, date: datetime, exerciselist: str
 @app.get("/deleteworkout")
 def deleteworkout(userid: str, workout_name: str, date: datetime):
     session = Session()
-
+    # all the workouts of the user
     find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
 
+    # all the shared workout of the user
     lst_shared_workouts = bring_shared_workoutid(chosed_user=userid)["response"]
 
+    # going over the lst
     for f in find:
-        if date == f[3] and workout_name == f[2]:
-            for i in lst_shared_workouts:
-                if f[0] == i:
+        if date == f[3] and workout_name == f[2]: #if the date match the workout name
+            for i in lst_shared_workouts: #going over the shared workouts
+                if f[0] == i: #if the workout id of the workout equal to the workout id of the shared workoout
+
+                    # delete from shared workout table
                     session.execute(
                         shared_workout_table.delete().where(
                             shared_workout_table.c.workoutid == i
@@ -318,7 +324,7 @@ def deleteworkout(userid: str, workout_name: str, date: datetime):
                     )
                     session.commit()
 
-
+            # delete from the full workout table
             session.execute(
                 workout_table.delete().where(
                     workout_table.c.workout_name == workout_name and workout_table.c.date == date
@@ -341,6 +347,8 @@ def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_na
     for f in find:
         if date == f[3] and workout_name == f[2]:
             workoutid1 = f[0]
+
+            # if the user sent to change the workout name and the date
             if new_workout_name != "" and new_date != "":
                 date1 = datetime.strptime(new_date, '%Y-%m-%d %H:%M:%S')
                 stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(
@@ -350,7 +358,7 @@ def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_na
                 session.commit()
                 return {"response": "update success"}
 
-
+            # if the user sent only change of date
             elif new_workout_name == "" and new_date != "":
                 date1 = datetime.strptime(new_date, '%Y-%m-%d %H:%M:%S')
                 stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(date=date1)
@@ -358,7 +366,7 @@ def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_na
                 session.commit()
                 return {"response": "update success"}
 
-
+            # if the user sent only change of workout name
             elif new_workout_name != "" and new_date == "":
                 stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(
                     workout_name=new_workout_name)
@@ -371,34 +379,34 @@ def updateworkout(userid: str, workout_name: str, date: datetime, new_workout_na
     return {"response": "nothing changed"}
 
 
-# add exercise to exist workout
-# **to change that it will be by workout id and current userid
 @app.get("/addexercisetoworkout")
 def addexercisetoworkout(userid: str, date: str, workout_name: str, exercise):
     session = Session()
+    # find the all workouts of the user
     find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
 
     workout = find[0]
 
+    # going over the list
     for f in find:
+        #from datetime to string
         date1 = f[3]
         date2 = date1.strftime('%Y-%m-%d')
-        if str(date1) == date:
-            if f[2] == workout_name:
+        if str(date1) == date: #if the dates match
+            if f[2] == workout_name: #if the workout name match
                 workout = f
-
-    # if workout == None:
-    #     return {"response": "the workout doesnt exist"}
 
     workoutid1 = workout[0]
     exercise1 = workout[4]
 
     exercise3 = []
 
+    # if there are exercises the new exercise insert to the current list
     if exercise1 != "":
         exercise3 = exercise1
         exercise3.append(exercise)
 
+    # if the list of the exercises is empty
     else:
         exercise3 = [exercise]
 
@@ -408,11 +416,11 @@ def addexercisetoworkout(userid: str, date: str, workout_name: str, exercise):
     return {"response": "the exercise added"}
 
 
-# delete exercise to exist workout
-# **to change that it will be by workout id and current userid
 @app.get("/deletexercisefromworkout")
 def deletexercisefromworkout(userid: str, date: datetime, workout_name: str, exercise_name: str):
     session = Session()
+
+    # find the all workouts of the user
     find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
     workoutid1 = find[0][0]
     workout = find[0]
@@ -420,18 +428,22 @@ def deletexercisefromworkout(userid: str, date: datetime, workout_name: str, exe
     sign = False
 
     for f in find:
+        # if the date and the workout name match
         if date == f[3] and workout_name == f[2]:
             workoutid1 = f[0]
             workout = f
-            sign = True
+            sign = True #this means the workout exist
             break
 
     exercise_lst = workout[4]
+    # if the workout exists
     if sign:
+        #going over the exercise list
         for e in exercise_lst:
-            exercise = json.loads(e)
-            if exercise["name"] == exercise_name:
-                exercise_lst.remove(e)
+            exercise = json.loads(e) #from string to dict
+            if exercise["name"] == exercise_name: #if the name of the exercises match
+                exercise_lst.remove(e) #remove the exercise from the list
+                # update the exercise list in the table to the update list (after the remove)
                 stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(exerciselist=exercise_lst)
                 session.execute(stmt)
                 session.commit()
@@ -443,6 +455,7 @@ def deletexercisefromworkout(userid: str, date: datetime, workout_name: str, exe
 def updateexercise(userid: str, workout_name: str, date: datetime, exercise_name, power, new_exercise_name, new_power):
     session = Session()
 
+    # find the all workouts of the user
     find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
     workoutid1 = find[0][0]
     workout= find[0]
@@ -453,17 +466,20 @@ def updateexercise(userid: str, workout_name: str, date: datetime, exercise_name
             workout = f
             break
 
-    exercise_lst = workout[4]
+    exercise_lst = workout[4] #the exercise list - (list[str])
+
+    # the sets in the list - the exercise turn from string to dict - the "sets" key bring dict value
     sets = json.loads(exercise_lst[0])["sets"]
 
     for e in exercise_lst:
-        exercise = json.loads(e)
-        if exercise["name"] == exercise_name:
-            sets = exercise["sets"]
-            exercise_lst.remove(e)
+        exercise = json.loads(e) #from string to dict
+        if exercise["name"] == exercise_name: #there is no two exercises with the same name.
+            sets = exercise["sets"] #save the list of the sest of the exercise
+            exercise_lst.remove(e) #remove the exercise which need to be edit
             break
 
     obj_set_lst = []
+    # to be able to create a new exercise, the sets should be in object format
     for i in sets:
         obj_set_lst.append(Set.load(i))
 
@@ -507,85 +523,40 @@ def addsettoexercise2(userid: str, date: str, workout_name: str, exercise_name: 
     exec = find[0][4]  # the lst of exer of the first workout
     workoutid1 = find[0][0]  # the workout id of the first workout
 
-    for f in find:
+    for f in find: #going over the workout list
         date1 = f[3]
         date2 = date1.strftime('%Y-%m-%d')
         if str(date1) == date:
-            if f[2] == workout_name:
-                exec = f[4]
+            if f[2] == workout_name: #if the exercise name match
+                exec = f[4] # list of str
                 workoutid1 = f[0]
                 break
 
     exercise2 = exercise_name
-    ex = json.loads(exec[0])
-    set1 = ex["sets"]
+    ex = json.loads(exec[0]) #list of dict
+    set1 = ex["sets"] #list of dict
     for e in exec:
-        e1 = json.loads(e)
-        if exercise2 == e1["name"]:
+        e1 = json.loads(e) #from str to dict
+        if exercise2 == e1["name"]: #if the exercise name match
             set1 = e1["sets"]
-            exec.remove(e)
+            exec.remove(e) #remove the sets list from the exercise
             break
-    s = json.loads(sets)
+    s = json.loads(sets) # from str to dict
 
-    set1.append(s)
-    set_lst = []
+    set1.append(s) #insert to the list if sets, the new set
+    set_lst = []#new set of objects- in this way I can create new Exercise object
     for s1 in set1:
         w = Set(repetitions=int(s1["repetitions"]), time=int(s1["time"]), weight=float(s1["weight"]),
                 distance_KM=float(s1["distance_KM"]))
         set_lst.append(w)
 
-    new_exec = Exercise(name=exercise2, power=power, sets=set_lst)
-    new_exec2 = json.dumps(new_exec.dump())
-    exec.append(new_exec2)
-    stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(exerciselist=exec)
+    new_exec = Exercise(name=exercise2, power=power, sets=set_lst) #new exercise object
+    new_exec2 = json.dumps(new_exec.dump()) #from object to str
+    exec.append(new_exec2) #add to the list of exercises
+    stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(exerciselist=exec) #update the exercise list
     session.execute(stmt)
     session.commit()
     return {"response": "the set added"}
-
-
-@app.get("/addsettoexercise")
-def addsettoexercise(userid: str, date: str, workout_name: str, exercise, sets):
-    session = Session()
-
-    find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
-    exec = find[0][4]  # the lst of exer of the first workout
-    workoutid1 = find[0][0]  # the workout id of the first workout
-
-    for f in find:
-        date1 = f[3]
-        date2 = date1.strftime('%Y-%m-%d')
-        if date2 == date:
-            if f[2] == workout_name:
-                exec = f[4]
-                workoutid1 = f[0]
-                break
-
-    exercise2 = json.loads(exercise)
-    ex = json.loads(exec[0])
-    set1 = ex["sets"]
-    for e in exec:
-        e1 = json.loads(e)
-        if exercise2["name"] == e1["name"]:
-            set1 = e1["sets"]
-            exec.remove(e)
-            break
-    s = json.loads(sets)
-
-    set1.append(s)
-    set_lst = []
-    for s1 in set1:
-        w = Set(repetitions=int(s1["repetitions"]), time=int(s1["time"]), weight=float(s1["weight"]),
-                distance_KM=float(s1["distance_KM"]))
-        set_lst.append(w)
-
-    new_exec = Exercise(name=exercise2["name"], power=exercise2["power"], sets=set_lst)
-    new_exec2 = json.dumps(new_exec.dump())
-    exec.append(new_exec2)
-    stmt = update(workout_table).where(workout_table.c.workoutid == workoutid1).values(exerciselist=exec)
-    session.execute(stmt)
-    session.commit()
-    return {"response": "the set added"}
-
 
 @app.get("/deletesetfromexercise")
 def deletesetfromexercise(userid: str, date: datetime, workout_name: str, exercise_name: str, sets_index: int):
@@ -842,6 +813,7 @@ def improve_with_params2(userid: str, exercise_name: str, s_date: datetime, e_da
 
 
 def return_dates_in_order(dates_lst) -> list:
+    # get list of workouts and returned them in order by dates
     new_lst = sorted(dates_lst, key=lambda x: x[3])
     print(new_lst)
     return new_lst
@@ -851,9 +823,9 @@ def return_dates_in_order(dates_lst) -> list:
 def bring_info(name: str):
     session = Session()
 
-    find = session.query(user_table).filter(user_table.c.name == name).first()
+    find = session.query(user_table).filter(user_table.c.name == name).first() #find user row by his username
 
-    if find is not None:
+    if find is not None: #is the user exist
         first_name = find[2]
         last_name = find[3]
         phone_num = find[4]
@@ -874,9 +846,9 @@ def bring_info(name: str):
 def change_privacy(name: str, public: bool) -> dict[str, str]:
     session = Session()
 
-    find = session.query(user_table).filter(user_table.c.name == name).first()
+    find = session.query(user_table).filter(user_table.c.name == name).first() #find user row by his username
 
-    if find is not None:
+    if find is not None: #if the user exist
         stmt = update(user_table).where(user_table.c.name == name).values(
             public=public
         )
@@ -885,7 +857,7 @@ def change_privacy(name: str, public: bool) -> dict[str, str]:
 
         session.commit()
 
-        if not public:
+        if not public: #if the user change to un public account, all his shared workout will delete from the shared workout table.
             response = delete_shared_workouts(chosed_user=name)
 
         return {"response": "the privacy changed"}
@@ -896,21 +868,21 @@ def change_privacy(name: str, public: bool) -> dict[str, str]:
 @app.get("/find_privacy")
 def find_privacy(userid: str) -> dict[str, bool]:
     session = Session()
-    find = session.query(user_table).filter(user_table.c.name == userid).first()
-    return {"response": find[9]}
+    find = session.query(user_table).filter(user_table.c.name == userid).first() #find user row by his username
+    return {"response": find[9]} #bring his privacy status
 
 
 @app.get("/public_user_lst")
 def public_user_lst(userid: str) -> dict[str, list[Any]]:
     session = Session()
 
-    find = session.query(user_table).filter(user_table.c.public == True).all()
+    find = session.query(user_table).filter(user_table.c.public == True).all()# list of all the public users
 
     username_public_lst = []
 
     for i in find:
         if i[0] != userid:
-            username_public_lst.append(i[0])
+            username_public_lst.append(i[0]) #list of the usernames of all the public users
 
     return {"response": username_public_lst}
 
@@ -918,10 +890,10 @@ def public_user_lst(userid: str) -> dict[str, list[Any]]:
 def shareworkout(userid: str, workout_name: str, date: datetime):
     session = Session()
 
-    find = session.query(workout_table).filter(workout_table.c.userid == userid).all()
+    find = session.query(workout_table).filter(workout_table.c.userid == userid).all()# list of all the workouts of the user
 
     for f in find:
-        if date == f[3] and workout_name == f[2]:
+        if date == f[3] and workout_name == f[2]: #if there is workout like the user sent, I add it to the shared workouts table
             session.execute(
                 shared_workout_table.insert().values(
                     userid=userid,
@@ -939,9 +911,9 @@ def shareworkout(userid: str, workout_name: str, date: datetime):
 def unshareworkout(workoutid: int):
     session = Session()
 
-    find = session.query(shared_workout_table).filter(shared_workout_table.c.workoutid == workoutid).first()
+    find = session.query(shared_workout_table).filter(shared_workout_table.c.workoutid == workoutid).first() #the workout in the shared workout table
 
-    if find:
+    if find: # if the workout exist there, it will be delete
         session.execute(
             shared_workout_table.delete().where(
                 shared_workout_table.c.workoutid == workoutid
@@ -957,21 +929,18 @@ def unshareworkout(workoutid: int):
 def bring_shared_workoutid(chosed_user: str):
     session = Session()
 
-    find = session.query(shared_workout_table).filter(shared_workout_table.c.userid == chosed_user).all()
+    find = session.query(shared_workout_table).filter(shared_workout_table.c.userid == chosed_user).all() #list of all the shared workouts of specific user
 
     workoutid_lst = []
     for f in find:
-        workoutid_lst.append(f[2])
+        workoutid_lst.append(f[2])# list of all his workout id of the workouts he shared
 
     return {"response": workoutid_lst}
 
 @app.get("/full_workout_by_workoutid")
 def full_workout_by_workoutid(workoutid: str) -> dict[str, tuple]:
     session = Session()
-    # find = []
     find = session.query(workout_table).filter(workout_table.c.workoutid == workoutid).first()
-    # return find
-    # return json.dumps(find)
     return {"response": find}
 
 
@@ -981,6 +950,8 @@ def delete_shared_workouts(chosed_user: str):
 
     find = session.query(shared_workout_table).filter(shared_workout_table.c.userid == chosed_user).all()
 
+    # delete from the shared workout table the all workouts of specific user-
+    # when he become un public or delete his account
     session.execute(
         shared_workout_table.delete().where(
             shared_workout_table.c.userid == chosed_user
