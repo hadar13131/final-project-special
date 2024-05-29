@@ -1,13 +1,6 @@
-import json
 import requests
 
 import flet as ft
-
-import sqlite3
-from project.models import Set, Exercise, Workout
-from datetime import datetime
-
-import project.api
 
 class ServerInfo:
     def __init__(self):
@@ -26,20 +19,28 @@ class ServerVeiw:
     def __init__(self) -> None:
         self.page = None
 
-        temp_server = ServerInfo()
+        self.temp_server = ServerInfo()
 
-        self.user_lst = temp_server.signed_up_users()["response"]
+        self.button_load = ft.IconButton(
+            icon=ft.icons.REPLAY_CIRCLE_FILLED, on_click=self.load_again, data=0
+        )
 
-
+    def load_again(self, e: ft.ControlEvent):
+        self.page.clean()
+        self.page.add(self.button_load)
+        self.page.add(self.return_workout_table())
+        self.page.update()
 
     def return_workout_table(self):
+        self.user_lst = self.temp_server.signed_up_users()["response"]
         row_lst = []
 
         for i in range(len(self.user_lst)):
             row_lst.append(
                 ft.DataRow(
                     cells=[
-                        ft.DataCell(ft.Text(self.user_lst[i])),
+                        ft.DataCell(ft.Text(self.user_lst[i][0])),
+                        ft.DataCell(ft.Text(self.user_lst[i][1])),
                     ],
                 ))
 
@@ -47,7 +48,8 @@ class ServerVeiw:
             # width=100,
             # height=100,
             columns=[
-                ft.DataColumn(ft.Text("users name")),
+                ft.DataColumn(ft.Text("Registered Users", font_family="Arial Rounded MT Bold", size=20)),
+                ft.DataColumn(ft.Text("Public Account", font_family="Arial Rounded MT Bold", size=20)),
             ],
             rows=row_lst
         )
@@ -58,6 +60,7 @@ class ServerVeiw:
         self.page = page
         self.page.scroll = ft.ScrollMode.ALWAYS
 
+        self.page.add(self.button_load)
         self.page.add(self.return_workout_table())
 
         self.page.bgcolor = "#E7CDFF"

@@ -644,53 +644,56 @@ def updatesetinexercise(userid: str, date: datetime, workout_name: str, exercise
     return {"response": "the set updated"}
 
 
-@app.get("/showimprovement")
-def showimprovement(userid: str, exercise_name: str, s_date: datetime, e_date: datetime):
-    session = Session()
-    exec_lst = []
-    find = session.query(workout_table).filter(
-        workout_table.c.userid == userid).all()  # filter by userid, get lst of workouts
+# @app.get("/showimprovement")
+# def showimprovement(userid: str, exercise_name: str, s_date: datetime, e_date: datetime):
+#     session = Session()
+#     exec_lst = []
+#     find = session.query(workout_table).filter(
+#         workout_table.c.userid == userid).all()  # filter by userid, get lst of workouts
+#
+#     for f in find:  # going through the workouts
+#         if f[3] > s_date and f[3] < e_date:  # check if its in the right date
+#             l = f[4]  # get the list of exercises
+#             for l2 in l:  # going through the exercises
+#                 l3 = json.loads(l2)  # from string to dict
+#                 if l3["name"] == exercise_name:  # check if there is the exercise the user want
+#                     exec_lst.append(f)  # add to lst the all workout
+#                     break
+#
+#     repete = 0
+#     time = 0
+#     weight = 0
+#     distance_KM = 0
+#     n = 0
+#
+#     for e in exec_lst:  # going through the full workout
+#         e2 = e[4]  # take the list of exercises
+#         for j in e2:  # going through the exercises list
+#             e3 = json.loads(j)  # change the str to dict
+#             e3 = e3["sets"]  # find the value of the "sets" key
+#             for i in e3:  # going through the lst of sets
+#                 repete += i["repetitions"]
+#                 time += int(i["time"])
+#                 weight += int(i["weight"])
+#                 distance_KM += int(i["distance_KM"])
+#                 n = n + 1  # counter
+#
+#     # find the avg
+#     if n != 0:
+#         repete = repete / n
+#         time = time / n
+#         weight = weight / n
+#         distance_KM = distance_KM / n
+#
+#         return {"count_sets": n, "repete": repete, "time": time, "weight": weight, "distance_KM": distance_KM}
+#
+#     else:
+#         return {"count_sets": 0, "repete": 0, "time": 0, "weight": 0, "distance_KM": 0}
 
-    for f in find:  # going through the workouts
-        if f[3] > s_date and f[3] < e_date:  # check if its in the right date
-            l = f[4]  # get the list of exercises
-            for l2 in l:  # going through the exercises
-                l3 = json.loads(l2)  # from string to dict
-                if l3["name"] == exercise_name:  # check if there is the exercise the user want
-                    exec_lst.append(f)  # add to lst the all workout
-                    break
 
-    repete = 0
-    time = 0
-    weight = 0
-    distance_KM = 0
-    n = 0
-
-    for e in exec_lst:  # going through the full workout
-        e2 = e[4]  # take the list of exercises
-        for j in e2:  # going through the exercises list
-            e3 = json.loads(j)  # change the str to dict
-            e3 = e3["sets"]  # find the value of the "sets" key
-            for i in e3:  # going through the lst of sets
-                repete += i["repetitions"]
-                time += int(i["time"])
-                weight += int(i["weight"])
-                distance_KM += int(i["distance_KM"])
-                n = n + 1  # counter
-
-    # find the avg
-    if n != 0:
-        repete = repete / n
-        time = time / n
-        weight = weight / n
-        distance_KM = distance_KM / n
-
-        return {"count_sets": n, "repete": repete, "time": time, "weight": weight, "distance_KM": distance_KM}
-
-    else:
-        return {"count_sets": 0, "repete": 0, "time": 0, "weight": 0, "distance_KM": 0}
-
-
+# its the Graph of the all parameters-
+# get userid, exercise name, start date, end date
+# return dict of the avg of each parameter in all the sets the user did at this time
 @app.get("/showimprovement2")
 def showimprovement2(userid: str, exercise_name: str, s_date: datetime, e_date: datetime):
     session = Session()
@@ -717,23 +720,24 @@ def showimprovement2(userid: str, exercise_name: str, s_date: datetime, e_date: 
         e2 = e[4]  # take the list of exercises
         for j in e2:  # going through the exercises list
             e3 = json.loads(j)  # change the str to dict
-            e3 = e3["sets"]  # find the value of the "sets" key
-            for i in e3:  # going through the lst of sets
+            if e3["name"] == exercise_name:
+                e3 = e3["sets"]  # find the value of the "sets" key
+                for i in e3:  # going through the lst of sets
 
-                # the improvement of the time should be by 1 KM
+                    # the improvement of the time should be by 1 KM
 
-                if int(i["distance_KM"]) != 0:
-                    time += (int(i["time"]) / i["distance_KM"])
-                    distance_KM += int(i["distance_KM"])
+                    if int(i["distance_KM"]) != 0:
+                        time += (int(i["time"]) / i["distance_KM"])
+                        distance_KM += int(i["distance_KM"])
 
-                else:
-                    time += int(i["time"])
-                    distance_KM += int(i["distance_KM"])
+                    else:
+                        time += int(i["time"])
+                        distance_KM += int(i["distance_KM"])
 
-                weight += int(i["weight"])
-                repete += i["repetitions"]
+                    weight += int(i["weight"])
+                    repete += i["repetitions"]
 
-                n = n + 1  # counter
+                    n = n + 1  # counter
 
     # find the avg
     if n != 0:
@@ -769,6 +773,9 @@ def return_the_avg(sets, name: str) -> int:  # if the name is count_sets, its re
         return 0
 
 
+# its the Graph of the single parameters
+# get userid, exercise name, start date, end date
+# return dict of list, in each list there is avgs of the sets - each workout is different avg
 @app.get("/improve_with_params2")
 def improve_with_params2(userid: str, exercise_name: str, s_date: datetime, e_date: datetime):
     session = Session()
@@ -816,7 +823,6 @@ def improve_with_params2(userid: str, exercise_name: str, s_date: datetime, e_da
 def return_dates_in_order(dates_lst) -> list:
     # get list of workouts and returned them in order by dates
     new_lst = sorted(dates_lst, key=lambda x: x[3])
-    print(new_lst)
     return new_lst
 
 
@@ -860,6 +866,8 @@ def change_privacy(name: str, public: bool) -> dict[str, str]:
 
         if not public: #if the user change to un public account, all his shared workout will delete from the shared workout table.
             response = delete_shared_workouts(chosed_user=name)
+
+
 
         return {"response": "the privacy changed"}
 
@@ -983,9 +991,10 @@ def signed_up_users():
 
     user_lst = []
     for i in find:
-        user_lst.append(i[0])
+        user_lst.append([i[0], i[9]])
 
     return {"response": user_lst}
+
 
 
 

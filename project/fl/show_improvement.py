@@ -16,16 +16,14 @@ class ShowImproveGraps:
 
         self.exercises_name_lst = self.client.user_exer_lst
 
-        self.exercise_name = ft.TextField(label="exercise name", label_style=ft.TextStyle(color=ft.colors.BLACK),
-                                          autofocus=True, border_color=ft.colors.WHITE)
+        # self.exercise_name = ft.TextField(label="exercise name", label_style=ft.TextStyle(color=ft.colors.BLACK),
+        #                                   autofocus=True, border_color=ft.colors.WHITE)
         self.search_exercise = ft.SearchBar(
             view_elevation=4,
             divider_color=ft.colors.AMBER,
             bar_hint_text="Search Exercise",
             view_hint_text="Choose a Exercise",
             on_change=self.handle_change,
-            on_submit=self.handle_submit,
-            on_tap=self.handle_tap,
             controls=[
                 ft.ListTile(title=ft.Text(self.exercises_name_lst[i]), on_click=self.close_anchor,
                             data=self.exercises_name_lst[i])
@@ -57,7 +55,6 @@ class ShowImproveGraps:
 
         self.date_picker1 = ft.DatePicker(
             on_change=self.change_date1,
-            on_dismiss=self.date_picker_dismissed1,
         )
 
         self.date_button1 = ft.ElevatedButton(
@@ -69,7 +66,6 @@ class ShowImproveGraps:
 
         self.date_picker2 = ft.DatePicker(
             on_change=self.change_date2,
-            on_dismiss=self.date_picker_dismissed2,
         )
 
         self.date_button2 = ft.ElevatedButton(
@@ -115,22 +111,22 @@ class ShowImproveGraps:
             )
         )
 
-        self.text_chart1 = ft.Container(
-            margin=10,
-            padding=10,
-            alignment=ft.alignment.center,
-            content=ft.Row(
-                alignment=ft.alignment.center,
-                width=600,
-                controls=[
-                    ft.Text(f"THE GRAPH SHOW THE AVG OF THE ALL {self.exercise_name.value} "
-                            f"EXERCISES YOU DID IN THE TIME YOU CHOSE", size=20, color=ft.colors.BLACK,
-                            weight=ft.FontWeight.W_100,
-                            selectable=True, font_family="Century Gothic", text_align=ft.alignment.center),
-
-                ],
-            )
-        )
+        # self.text_chart1 = ft.Container(
+        #     margin=10,
+        #     padding=10,
+        #     alignment=ft.alignment.center,
+        #     content=ft.Row(
+        #         alignment=ft.alignment.center,
+        #         width=600,
+        #         controls=[
+        #             ft.Text(f"THE GRAPH SHOW THE AVG OF THE ALL {self.exercise_name} "
+        #                     f"EXERCISES YOU DID IN THE TIME YOU CHOSE", size=20, color=ft.colors.BLACK,
+        #                     weight=ft.FontWeight.W_100,
+        #                     selectable=True, font_family="Century Gothic", text_align=ft.alignment.center),
+        #
+        #         ],
+        #     )
+        # )
 
         self.text_chart2 = ft.Container(
             margin=10,
@@ -150,7 +146,7 @@ class ShowImproveGraps:
         )
 
     def handle_change(self, e):
-        print(f"handle_change e.data: {e.data}")
+        self.exercise_name = e.control.value
         query = e.data.lower()
         filtered_exercises = [
             ft.ListTile(title=ft.Text(exercise), on_click=self.close_anchor, data=exercise)
@@ -164,16 +160,10 @@ class ShowImproveGraps:
         # self.update_suggestions(e.data)
         self.search_exercise.update()
 
-    def handle_submit(self, e):
-        print(f"handle_submit e.data: {e.data}")
-
-    def handle_tap(self, e):
-        print(f"handle_tap")
-
     def close_anchor(self, e):
         text = f"{e.control.data}"
         self.search_exercise.close_view(text)
-        self.exercise_name.value = e.control.data
+        self.exercise_name = e.control.data
         self.selected_exercise = e.control.data
         self.page.update()
 
@@ -190,26 +180,21 @@ class ShowImproveGraps:
         self.s_date = self.date_picker1.value
         self.massageD1.value = self.date_picker1.value.strftime("%x")
         self.page.update()
-        print(f"Date picker 1 changed, value is {self.date_picker1.value}")
 
-    def date_picker_dismissed1(self, e):
-        print(f"Date picker dismissed, value is {self.date_picker1.value}")
 
     def change_date2(self, e):
         self.e_date = self.date_picker2.value
         # self.massageD2.value = str(self.date_picker2.value)
         self.massageD2.value = self.date_picker2.value.strftime("%x")
         self.page.update()
-        print(f"Date picker 2 changed, value is {self.date_picker2.value}")
 
-    def date_picker_dismissed2(self, e):
-        print(f"Date picker dismissed, value is {self.date_picker2.value}")
 
     def show_graph1_on_click(self, e: ft.ControlEvent) -> None:
         username = self.client.username
         self.workout_lst = self.client.user_workout_lst
 
-        self.exercise_name2 = self.exercise_name.value
+        # self.exercise_name2 = self.exercise_name
+        self.exercise_name2 = self.search_exercise.value
 
         s_date = self.s_date
         e_date = self.e_date
@@ -273,7 +258,23 @@ class ShowImproveGraps:
                 ),
 
                 ft.Row([
-                    self.text_chart1
+                    # self.text_chart1
+                    ft.Container(
+                        margin=10,
+                        padding=10,
+                        alignment=ft.alignment.center,
+                        content=ft.Row(
+                            alignment=ft.alignment.center,
+                            width=600,
+                            controls=[
+                                ft.Text(f"THE GRAPH SHOW THE AVG OF THE ALL {exercise_name} "
+                                        f"EXERCISES YOU DID IN THE TIME YOU CHOSE", size=20, color=ft.colors.BLACK,
+                                        weight=ft.FontWeight.W_100,
+                                        selectable=True, font_family="Century Gothic", text_align=ft.alignment.center),
+
+                            ],
+                        )
+                    )
                 ]),
 
                 ft.Row(
