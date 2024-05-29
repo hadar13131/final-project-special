@@ -51,7 +51,6 @@ class Profile_Page:
 
         self.button1 = ft.ElevatedButton(text="change", on_click=self.change_your_info, bgcolor='#8532B8', color='white')
 
-
         self.public = ft.CupertinoSwitch(
             label="Public Account",
             on_change=self.change_privacy,
@@ -94,11 +93,15 @@ class Profile_Page:
                                          self.age,
                                          self.gender,
                                          self.goals,
+
+                                         ft.Row([
+                                             self.button1,
+                                             self.massageE,
+                                         ]),
+
                                          ft.Text("**if you will switch to un public, all of your shared posts will be un shared",
                                                  color=ft.colors.RED),
                                          self.public,
-                                         self.button1,
-                                         self.massageE
                                      ]),
 
                                  ],
@@ -137,8 +140,6 @@ class Profile_Page:
 
 
         self.table1 = ft.Row(
-            # scroll=ft.ScrollMode.ALWAYS,
-            # width=600,
             controls=[
                 ft.Container(
                     margin=10,
@@ -147,23 +148,7 @@ class Profile_Page:
                     bgcolor='#CC99FF',
                     content=ft.Row(
                         controls=[
-                            # ft.Row([
-                            #     ft.Text("YOUR WORKOUTS PLAN:", size=20, color='#8532B8',
-                            #             weight=ft.FontWeight.W_500,
-                            #             selectable=True, font_family="Arial Rounded MT Bold"),
-                            # ]),
                             self.workout_table
-                            # ft.Column([
-                            #
-                            #         # scroll=ft.ScrollMode.ALWAYS,
-                            #         self.workout_table
-                            #     # ft.ElevatedButton(text="change details", on_click=self.change_your_info,
-                            #     #                   bgcolor='#8532B8',
-                            #     #                   color='white'),
-                            # ]
-
-                            # ),
-
                         ]
                     )
                 ),
@@ -358,19 +343,6 @@ class Profile_Page:
 
         return table1
 
-    # def workout_info_format(self, workout):
-    #     for i1 in workout:
-    #         i = json.loads(i1)
-    #         ft.ExpansionTile(
-    #             title=ft.Text("exercises-"),
-    #             subtitle=ft.Text("TAP TO SEE THE EXERCISES"),
-    #             affinity=ft.TileAffinity.LEADING,
-    #             # initially_expanded=True,
-    #             collapsed_text_color=ft.colors.BLUE,
-    #             text_color=ft.colors.BLUE,
-    #             controls=self.format_exercise_lst(i["exerciselist"])
-    #         )
-
     def format_exercise_lst(self, e_lst):
         lst = []
         if not e_lst:
@@ -489,64 +461,61 @@ class HomePage:
         self.page = None
         self.client = client
 
-        self.text1 = ft.Text("HomePage", size=55, color='#8532B8', weight=ft.FontWeight.W_500,
-                             selectable=True, font_family="Elephant")
-
-        self.m1 = ft.Text("count days", size=20, color='#8532B8')
-        self.m2 = ft.Text("week plan", size=20, color='#8532B8')
-
-        self.home_page_panel = ft.Column(
-            [
-                self.text1,
-                self.m1,
-                self.m2
-            ]
+        self.text1 = ft.Text(
+            f"A life of FITNESS and HEALTH begins here!",
+            size=55, color=ft.colors.BLACK, weight=ft.FontWeight.W_500,
+            selectable=True, font_family="Century Gothic"
         )
 
+        self.text2 = ft.Text(
+            f"In POWER APP you can add the trainings you performed, \n"
+            f"edit them, see your improvement in each exercise, \n"
+            f"and share with friends!",
+            size=30, color=ft.colors.BLACK, weight=ft.FontWeight.W_500,
+            font_family="Aharoni"
+        )
+
+
         self.home_page_panel = ft.Column(
-            alignment=ft.alignment.top_left,
             controls=[
-                # self.button_Back,
-                ft.Container(
-                    margin=20,
-                    padding=20,
-                    # height=10,
-                    # width=10,
+                ft.Row(
                     alignment=ft.alignment.center,
-                    bgcolor=ft.colors.WHITE,
-                    border_radius=10,
-                    border=ft.border.all(30, '#E1F3F1'),
-                    content=ft.Column(
-                        [
+                    controls=[self.text1]
+                ),
 
-                            ft.Text("HOME PAGE", size=55, color=ft.colors.BLACK, weight=ft.FontWeight.W_500,
-                                    selectable=True, font_family="Century Gothic"),
-
-                            ft.Text("NEW MASSAGE", size=30, color=ft.colors.BLACK, weight=ft.FontWeight.W_500,
-                                    selectable=True,
-                                    font_family="Century Gothic"),
-                        ]
-                    )
+                ft.Row(
+                    alignment=ft.alignment.bottom_left,
+                    # width=600,
+                    controls=[
+                        ft.Container(
+                            margin=20,
+                            padding=20,
+                            content=ft.Row(
+                                alignment=ft.alignment.bottom_left,
+                                controls=[
+                                    self.text2,
+                                ]
+                            )
+                        ),
+                    ],
                 )
-
-            ]
+            ],
         )
-
-
 
     def main(self, page: ft.Page) -> None:
         self.page = page
         self.page.scroll = ft.ScrollMode.ALWAYS
 
+        self.page.bgcolor = '#4BDDFF'
+
         row_container = ft.Row([self.home_page_panel])
         row_container.main_alignment = ft.MainAxisAlignment.CENTER
 
-        row_container.width = 920
+        row_container.width = 1000
         self.page.add(row_container)
 
         self.page.horizontal_alignment = 'CENTER'
         self.page.vertical_alignment = 'CENTER'
-        self.page.bgcolor = "#E7CDFF"
         self.page.update()
 
 

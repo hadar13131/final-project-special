@@ -46,12 +46,7 @@ class MenuApp:
     def show_home_page(self):
         self.page.clean()
         app_instance = profile_page.HomePage(self.client)
-        row_container = ft.Row([app_instance.home_page_panel])
-        self.page.add(row_container)
-        self.page.update()
-
-        # row_container = ft.Row([app_instance.home_page_panel])
-        # self.page.add(row_container)
+        app_instance.main(self.page)
 
     def change_page(self, e: ft.ControlEvent, page: ft.Page):
         selected_index = e.control.selected_index
@@ -94,12 +89,8 @@ class MenuApp:
             ]
         )
 
-        # def check_item_clicked(e):
-        #     e.control.checked = not e.control.checked
-        #     self.page.update()
-
         self.page.appbar = ft.AppBar(
-            leading=ft.Icon(ft.icons.PALETTE),
+            leading=ft.Icon(ft.icons.FITNESS_CENTER_ROUNDED),
             leading_width=40,
             title=ft.Text("Power APP"),
             title_text_style=ft.TextStyle(size=40, weight=ft.FontWeight.BOLD, color="#5E5868"),

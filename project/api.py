@@ -85,7 +85,8 @@ def lst_of_exercise_names(userid: str):
             n2 = json.loads(i)
             lst.append(n2["name"])
     # return lst
-    return {"response": lst}
+    lst2 = set(lst)
+    return {"response": lst2}
 
 
 @app.get("/find_first_name")
@@ -961,5 +962,31 @@ def delete_shared_workouts(chosed_user: str):
     session.commit()
 
     return {"response": "delete success"}
+
+
+@app.get("/username_lst")
+def username_lst():
+    session = Session()
+    find = session.query(user_table).all()
+
+    user_lst = []
+    for i in find:
+        user_lst.append(i[0])
+
+    return {"response": user_lst}
+
+
+@app.get("/signed_up_users")
+def signed_up_users():
+    session = Session()
+    find = session.query(user_table).all()
+
+    user_lst = []
+    for i in find:
+        user_lst.append(i[0])
+
+    return {"response": user_lst}
+
+
 
 

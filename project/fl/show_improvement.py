@@ -18,9 +18,24 @@ class ShowImproveGraps:
 
         self.exercise_name = ft.TextField(label="exercise name", label_style=ft.TextStyle(color=ft.colors.BLACK),
                                           autofocus=True, border_color=ft.colors.WHITE)
-        # self.search = ft.SearchBar(
-        #
-        # )
+        self.search_exercise = ft.SearchBar(
+            view_elevation=4,
+            divider_color=ft.colors.AMBER,
+            bar_hint_text="Search Exercise",
+            view_hint_text="Choose a Exercise",
+            on_change=self.handle_change,
+            on_submit=self.handle_submit,
+            on_tap=self.handle_tap,
+            controls=[
+                ft.ListTile(title=ft.Text(self.exercises_name_lst[i]), on_click=self.close_anchor,
+                            data=self.exercises_name_lst[i])
+                for i in range(len(self.exercises_name_lst))
+            ],
+        )
+
+        self.massage_show_workout = ft.TextField(read_only=True, border="none", color='#A8468C')
+
+
         self.s_date_text = ft.Text("start date-", size=20, color='#8532B8')
         self.day1 = ft.TextField(label="day", autofocus=True, border_color='#8532B8')
         self.month1 = ft.TextField(label="month", autofocus=True, border_color='#8532B8')
@@ -64,17 +79,6 @@ class ShowImproveGraps:
             on_click=lambda _: self.date_picker2.pick_date(),
         )
 
-        self.show_improvement_panel = ft.Column(
-            [
-                self.exercise_name,
-                self.date_button1,
-                self.massageD1,
-                self.date_button2,
-                self.massageD2,
-                self.button1,
-                self.errorM
-            ]
-        )
 
         self.view = ft.Container(
             margin=10,
@@ -88,7 +92,7 @@ class ShowImproveGraps:
                 controls=[
                     ft.Text("CHECK YOUR IMPROVEMENT", size=55, color=ft.colors.WHITE, weight=ft.FontWeight.W_500,
                             selectable=True, font_family="Elephant", text_align=ft.alignment.center),
-                    self.exercise_name,
+                    self.search_exercise,
 
                     ft.Row(
                         controls=[
@@ -144,6 +148,43 @@ class ShowImproveGraps:
                 ],
             )
         )
+
+    def handle_change(self, e):
+        print(f"handle_change e.data: {e.data}")
+        query = e.data.lower()
+        filtered_exercises = [
+            ft.ListTile(title=ft.Text(exercise), on_click=self.close_anchor, data=exercise)
+            for exercise in self.exercises_name_lst if query in exercise.lower() or query == ""
+        ]
+        self.search_exercise.controls = filtered_exercises
+        self.search_exercise.close_view(e.data)
+        self.page.update()
+        self.search_exercise.open_view()
+        self.page.update()
+        # self.update_suggestions(e.data)
+        self.search_exercise.update()
+
+    def handle_submit(self, e):
+        print(f"handle_submit e.data: {e.data}")
+
+    def handle_tap(self, e):
+        print(f"handle_tap")
+
+    def close_anchor(self, e):
+        text = f"{e.control.data}"
+        self.search_exercise.close_view(text)
+        self.exercise_name.value = e.control.data
+        self.selected_exercise = e.control.data
+        self.page.update()
+
+    def update_suggestions(self, query):
+        query = query.lower()
+        filtered_exercises = [
+            ft.ListTile(title=ft.Text(exercise), on_click=self.close_anchor, data=exercise)
+            for exercise in self.exercises_name_lst if query in exercise.lower() or query == ""
+        ]
+        self.search_exercise.controls = filtered_exercises
+        # self.page.update()
 
     def change_date1(self, e):
         self.s_date = self.date_picker1.value

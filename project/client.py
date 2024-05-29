@@ -130,6 +130,7 @@ class Client:
         )
 
         self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
+        self.user_exer_lst = self.lst_of_exercise_names(userid=self.username)["response"]
 
         return response.json()
 
@@ -142,6 +143,7 @@ class Client:
         )
 
         self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
+        self.user_exer_lst = self.lst_of_exercise_names(userid=self.username)["response"]
 
         return response.json()
 
@@ -155,6 +157,7 @@ class Client:
         )
 
         self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
+        self.user_exer_lst = self.lst_of_exercise_names(userid=self.username)["response"]
 
         return response.json()
 
@@ -169,6 +172,7 @@ class Client:
         self.user_exer_lst.append(exercise2["name"])
 
         self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
+        self.user_exer_lst = self.lst_of_exercise_names(userid=self.username)["response"]
 
         return response.json()
 
@@ -181,6 +185,8 @@ class Client:
         )
 
         self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
+        self.user_exer_lst = self.lst_of_exercise_names(userid=self.username)["response"]
+
         return response.json()
 
     def updateexercise(self, userid, date, workout_name, exercise_name, power, new_exercise_name, new_power):
@@ -193,6 +199,8 @@ class Client:
         )
 
         self.user_workout_lst = self.lst_of_workouts_by_username(self.username)["response"]
+        self.user_exer_lst = self.lst_of_exercise_names(userid=self.username)["response"]
+
         return response.json()
 
 
@@ -369,6 +377,13 @@ class Client:
         response = requests.get(
             f"{self.server_address}/delete_shared_workouts",
             params=credentials
+        )
+
+        return response.json()
+
+    def username_lst(self):
+        response = requests.get(
+            f"{self.server_address}/username_lst"
         )
 
         return response.json()

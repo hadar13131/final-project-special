@@ -24,6 +24,7 @@ class EditWorkout:
 
         self.massage = ft.TextField(read_only=True, border="none", color='#A8468C')
         self.massage2 = ft.TextField(read_only=True, border="none", color='#A8468C')
+        self.massage3 = ft.TextField(read_only=True, border="none", color='#A8468C')
 
         self.lst_name_workout = ft.Dropdown(
             options=self.return_workout_names(self.date),
@@ -68,6 +69,9 @@ class EditWorkout:
         # show the add exercise format
         self.button_show_add_exercise = ft.ElevatedButton(text="add exercise", on_click=self.add_exercise_format,
                                                           bgcolor='#E1F3F1', color='black')
+
+        self.button_show_add_exercise = ft.IconButton(icon=ft.icons.ADD_ROUNDED,
+                                                      on_click=self.add_exercise_format, data=0)
 
         # click when you want to add the exercise you puts
         self.button_add_exercise = ft.ElevatedButton(text="add exercise", on_click=self.add_exercise,
@@ -149,7 +153,10 @@ class EditWorkout:
                                                     border_color='#8532B8')
 
         # workout name change
-        self.power_to_change = ft.TextField(label="change power", autofocus=True, border_color='#8532B8')
+        # self.power_to_change = ft.TextField(label="change power", autofocus=True, border_color='#8532B8')
+        self.power_to_change = ft.RadioGroup(content=ft.Row([
+            ft.Radio(value="True", label="Yes"),
+            ft.Radio(value="False", label="No")]))
 
         self.repetitions_to_change = ft.TextField(label="change repetitions", autofocus=True, border_color='#8532B8')
         self.time_to_change = ft.TextField(label="change time", autofocus=True, border_color='#8532B8')
@@ -169,6 +176,9 @@ class EditWorkout:
             on_click=lambda _: self.date_picker1.pick_date(),
         )
         self.massageD1 = ft.TextField(value=self.str_date, read_only=True, border="none", color='#A8468C')
+
+
+        self.button_BACK_exercise = ft.ElevatedButton("BACK TO CHOOSE EXERCISE", on_click=self.back_to_choose_exercise)
 
 
 
@@ -207,7 +217,7 @@ class EditWorkout:
             row_container = ft.Row([self.select_workout_panel])
             row_container.main_alignment = ft.MainAxisAlignment.CENTER
 
-            row_container.width = 600
+            row_container.width = 800
             self.page.add(row_container)
 
             self.page.horizontal_alignment = 'CENTER'
@@ -291,13 +301,22 @@ class EditWorkout:
             ])
 
             self.page.add(self.edit_workout_details_panel)  # the details of the selected workout
-            self.page.add(self.workout_name_to_change,
-                          self.button_date_to_change)  # space to fill new name and new date of the workout
-            self.page.add(self.massageD1)  # show the new selected date
+            self.page.add(ft.Column([self.workout_name_to_change, ft.Row([self.button_date_to_change, self.massageD1])]))
             self.massage.value = ""
             self.page.add(self.button_edit_workout, self.massage)
             self.page.add(self.show_exercise_lst)
             self.page.update()
+
+
+
+            # self.page.add(self.edit_workout_details_panel)  # the details of the selected workout
+            # self.page.add(self.workout_name_to_change,
+            #               self.button_date_to_change)  # space to fill new name and new date of the workout
+            # self.page.add(self.massageD1)  # show the new selected date
+            # self.massage.value = ""
+            # self.page.add(self.button_edit_workout, self.massage)
+            # self.page.add(self.show_exercise_lst)
+            # self.page.update()
 
     def change_workout_details(self, e: ft.ControlEvent):
         self.old_workout_name = self.workoutname  # old name
@@ -372,13 +391,29 @@ class EditWorkout:
 
             self.page.clean()
             self.page.add(self.edit_panel2)  # the details of the selected workout
-            self.page.add(self.workout_name_to_change,
-                          self.button_date_to_change)  # space to fill new name and new date of the workout
-            self.page.add(self.massageD1)  # show the new selected date
+            self.page.add(ft.Column([self.workout_name_to_change, ft.Row([self.button_date_to_change, self.massageD1])]))
             self.massage.value = ""
             self.page.add(self.button_edit_workout, self.massage)
             self.page.add(self.show_exercise_lst)
             self.page.update()
+
+            # self.page.clean()
+            # self.page.add(self.edit_panel2)  # the details of the selected workout
+            # self.page.add(self.workout_name_to_change,
+            #               self.button_date_to_change)  # space to fill new name and new date of the workout
+            # self.page.add(self.massageD1)  # show the new selected date
+            # self.massage.value = ""
+            # self.page.add(self.button_edit_workout, self.massage)
+            # self.page.add(self.show_exercise_lst)
+            # self.page.update()
+
+    def back_to_choose_exercise(self, e: ft.ControlEvent):
+        self.page.clean()
+        self.page.add(self.workout_details_panel_final)
+        self.page.add(ft.Row(alignment=ft.alignment.center, controls=[self.lst_name_exercises, self.button_show_add_exercise]))
+        # self.page.add(self.lst_name_exercises)
+        self.page.add(ft.Row([self.button_select_exercise]))
+        self.page.update()
 
     def exercise_menu(self, e: ft.ControlEvent):
         if not self.lst_name_exercises.value:
@@ -386,7 +421,8 @@ class EditWorkout:
             self.page.update()
 
         else:
-            self.page.add(self.button_show_edit_exercise, self.button_show_delete_exercise, self.button_show_add_exercise)
+            # self.page.add(self.button_show_edit_exercise, self.button_show_delete_exercise, self.button_show_add_exercise)
+            self.page.add(self.button_show_edit_exercise, self.button_show_delete_exercise)
             self.page.update()
 
     def show_the_exercises(self, e: ft.ControlEvent):
@@ -396,13 +432,48 @@ class EditWorkout:
             self.page.update()
 
         else:
+            self.workout_details_panel_final = ft.Row([
+                ft.Container(
+                    margin=10,
+                    padding=10,
+                    alignment=ft.alignment.center,
+                    content=ft.Row(
+                        controls=[
+                            ft.Column(
+                                [
+                                    ft.Text(f"THE WORKOUT YOU CHOSE TO EDIT- {self.workoutname}", size=45,
+                                            color='#8532B8',
+                                            weight=ft.FontWeight.W_500,
+                                            selectable=True,
+                                            font_family="Century Gothic"),
+                                    ft.Row(
+                                        [
+                                            ft.Text("in the date- " + self.str_date, size=25, color='#0A54B6',
+                                                    weight=ft.FontWeight.W_500,
+                                                    selectable=True, font_family="Century Gothic"),
+                                        ]
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+                )
+            ])
             self.lst_name_exercises = ft.Dropdown(
                 width=100,
                 options=self.return_exercises_names(date=self.first_date, workout_name=self.workoutname),
             )
-            self.page.add(self.lst_name_exercises)
-            self.page.add(self.button_select_exercise)
+            self.page.clean()
+
+            self.page.add(self.workout_details_panel_final)
+            self.page.add(ft.Row([self.lst_name_exercises, self.button_show_add_exercise]))
+            self.page.add(ft.Row([self.button_select_exercise]))
             self.page.update()
+
+            # self.page.add(self.workout_details_panel_final)
+            # self.page.add(self.lst_name_exercises)
+            # self.page.add(self.button_select_exercise)
+            # self.page.update()
 
     def return_exercises_names(self, date, workout_name):
         lst = self.date_workout(date)
@@ -498,7 +569,7 @@ class EditWorkout:
             self.page.clean()
             self.page.add(self.edit_workout_details_panel)  # the details of the selected workout
             self.page.add(self.exercise_name_to_change,
-                          self.power_to_change)  # space to fill new name and new date of the workout
+                          ft.Row([ft.Text('CHANGE POWER- ', size=15, font_family="Century Gothic"), self.power_to_change]))
             self.massage.value = ""
             self.page.add(self.button_edit_exercise, self.massage)
             self.page.add(self.show_set_lst)
@@ -580,7 +651,7 @@ class EditWorkout:
             self.power_to_change.value = ""
             self.page.add(self.edit_panel2)  # the details of the selected workout
             self.page.add(self.exercise_name_to_change,
-                          self.power_to_change)  # space to fill new name and new date of the workout
+                          ft.Row([ft.Text('CHANGE POWER- ', size=15, font_family="Century Gothic"), self.power_to_change]))  # space to fill new name and new date of the workout
             self.massage.value = ""
             self.page.add(self.button_edit_exercise, self.massage)
             self.page.add(self.show_set_lst)
@@ -595,7 +666,16 @@ class EditWorkout:
                                                         exercise_name=exercise_name)
 
         self.page.add(ft.Text(response["response"]))
+        self.lst_name_exercises = ft.Dropdown(
+            width=100,
+            options=self.return_exercises_names(date=self.first_date, workout_name=self.workoutname),
+        )
+        self.page.clean()
+        self.page.add(self.workout_details_panel_final)
+        self.page.add(ft.Row([self.lst_name_exercises, self.button_show_add_exercise]))
+        self.page.add(ft.Row([self.button_select_exercise]))
         self.page.update()
+
 
     def add_exercise_format(self, e: ft.ControlEvent):
         self.exercise_name = ft.TextField(label="exercise name", autofocus=True, border_color='#8532B8')
@@ -630,9 +710,11 @@ class EditWorkout:
                 ]
             )
         )])
-
+        self.page.clean()
+        self.page.add(ft.Row([self.button_BACK_exercise]))
         self.page.add(self.exercise_info)
         self.page.update()
+
 
     def add_exercise(self, e: ft.ControlEvent):
         username = self.client.username
@@ -654,6 +736,7 @@ class EditWorkout:
 
                 self.addexerciseM.value = response2["response"]
                 self.page.clean()
+                self.page.add(ft.Row([self.button_BACK_exercise]))
                 self.page.add(ft.Row([self.exercise_info, self.show_add_set_button1]))
                 self.addsetM.value = ""
                 self.page.update()
@@ -708,6 +791,7 @@ class EditWorkout:
         self.weightS1.value = ""
         self.distance_KMS1.value = ""
         self.addsetM.value = ""
+        self.page.add(ft.Row([self.button_BACK_exercise]))
         self.page.add(ft.Row([self.exercise_info, self.set_info]))
         # self.page.add(self.button_Finish)
         self.page.update()
@@ -776,14 +860,13 @@ class EditWorkout:
 
 
 
-
-
     def set_menu(self, e: ft.ControlEvent):
         if not self.lst_name_sets.value:
-            self.page.add(ft.Text("please choose a set"))
+            self.massage3.value = "please choose a set"
             self.page.update()
         else:
-            self.page.add(self.button_show_edit_set, self.button_show_delete_set, self.button_show_add_set)
+            self.massage3.value = ""
+            self.page.add(ft.Column([self.button_show_edit_set, self.button_show_delete_set, self.button_show_add_set]))
             self.page.update()
 
     def return_sets_info(self, date, workout_name, exercise_name):
@@ -823,25 +906,40 @@ class EditWorkout:
             sets_info_lst = []
             n = 1
             for s in self.set_lst:
-                sets_info_lst.append(ft.Text(f"set {n}- "))
-                sets_info_lst.append(ft.Text(f"repetitions - {s['repetitions']}"))
-                sets_info_lst.append(ft.Text(f"time (MINUTES) - {s['time']}"))
-                sets_info_lst.append( ft.Text(f"weight (KG) - {s['weight']}"))
-                sets_info_lst.append(ft.Text(f"distance KM - {s['distance_KM']}"))
+                sets_info_lst.append(ft.Text(f"set {n}- ", size=20, font_family="Arial Rounded MT Bold"))
+                sets_info_lst.append(ft.Text(f"repetitions - {s['repetitions']}", size=15, font_family="Arial Rounded MT Bold"))
+                sets_info_lst.append(ft.Text(f"time (MINUTES) - {s['time']}", size=15, font_family="Arial Rounded MT Bold"))
+                sets_info_lst.append( ft.Text(f"weight (KG) - {s['weight']}", size=15, font_family="Arial Rounded MT Bold"))
+                sets_info_lst.append(ft.Text(f"distance KM - {s['distance_KM']}", size=15, font_family="Arial Rounded MT Bold"))
 
                 n += 1
 
-            info = ft.Column(sets_info_lst)
-            self.page.add(info)
+            self.set_info = ft.Column(controls=[ft.Container(
+                margin=10,
+                padding=10,
+                alignment=ft.alignment.top_left,
+                bgcolor='#CC99FF',
+                border_radius=10,
+                border=ft.border.all(3, '#8532B8'),
+                content=ft.Column(sets_info_lst)
+            )])
+            # self.page.add(info)
             self.page.update()
 
             self.lst_name_sets = ft.Dropdown(
                 width=100,
                 options=self.return_sets_names()
             )
+            self.page.clean()
+            self.page.add(self.edit_workout_details_panel)
+            self.page.add(ft.Row([
+                self.set_info,
 
-            self.page.add(self.lst_name_sets)
-            self.page.add(self.button_select_set)
+            ]))
+            self.page.add(ft.Row([self.set_info, self.lst_name_sets, self.button_select_set, self.massage3, self.button_show_add_set]))
+
+            # self.page.add(self.lst_name_sets)
+            # self.page.add(self.button_select_set)
             self.page.update()
 
     def return_sets_names(self):

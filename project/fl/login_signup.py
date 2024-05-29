@@ -1,18 +1,12 @@
-from project.models import Set, Exercise
-import json
 import hashlib
 
-import calendar
-from datetime import datetime
-
 import flet as ft
-import calendar
-from datetime import datetime
 from project.client import Client
 
 from menu_page import MenuApp
 import welcome_page
 import project.check_errors as c_e
+
 
 class LoginPage:
     def __init__(self) -> None:
@@ -70,9 +64,6 @@ class LoginPage:
 
                         ]
                     )
-
-
-
 
     def back_to_welcome(self, e: ft.ControlEvent) -> None:
         self.page.clean()
@@ -365,7 +356,6 @@ class SignUpPage:
         self.page.update()
 
 
-
     def go_to_check_email(self, e: ft.ControlEvent) -> None:
         email = self.email.value
         if email:
@@ -397,13 +387,6 @@ class SignUpPage:
             self.massageE.value = "please enter your email"
 
         self.page.update()
-
-    # def go_to_fill_info(self, e: ft.ControlEvent) -> None:
-    #     self.page.clean()
-    #     row = ft.Row([self.main_panel_signup2])
-    #     self.page.add(row)
-    #
-    #     self.page.update()
 
     # to signup
     def click2(self, e: ft.ControlEvent) -> None:

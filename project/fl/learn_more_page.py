@@ -6,14 +6,8 @@ class LearnMorePage:
 
     def __init__(self) -> None:
         self.page = None
-        self.text1 = ft.Text("ABOUT US", size=60, color='#8532B8', weight=ft.FontWeight.W_500,
-                             selectable=True, font_family="Elephant")
 
-        self.m1 = ft.Text("information", size=20, color='#8532B8')
-        self.m2 = ft.Text("pictures", size=20, color='#8532B8')
-
-        self.button_Back = ft.ElevatedButton(text="BACK", on_click=self.back_to_welcome, bgcolor='#8532B8',
-                                             color='white')
+        self.button_Back = ft.ElevatedButton(text="BACK", on_click=self.back_to_welcome, bgcolor="#99CCFF", color='black')
 
         self.main_text = ft.Text(
             f"POWER APP is a training application, where you can \nPLAN, EDIT and SEE your progress over time. \n\n"
@@ -24,24 +18,25 @@ class LearnMorePage:
         )
 
         self.learn_more_panel = ft.Column(
-            [
-                self.text1,
-                self.m1,
-                self.m2,
-                self.button_Back
-            ]
-        )
-
-        self.learn_more_panel = ft.Column(
-            # width=600,
+            alignment=ft.alignment.top_left,
             controls=[
                 self.button_Back,
-                ft.Text("ABOUT US", size=60, color='#8532B8', weight=ft.FontWeight.W_500,
-                        selectable=True, font_family="Elephant"),
-                self.main_text,
+                ft.Container(
+                    margin=20,
+                    padding=20,
+                    # height=10,
+                    # width=10,
+                    alignment=ft.alignment.center,
+                    bgcolor=ft.colors.WHITE,
+                    content=ft.Column([
+                        ft.Text("ABOUT US-", size=60, color='#A02B93', weight=ft.FontWeight.W_500,
+                                selectable=True, font_family="Aharoni"),
+                        self.main_text,
+                    ])
+                )
+
             ]
         )
-
 
     def back_to_welcome(self, e: ft.ControlEvent) -> None:
         self.page.clean()

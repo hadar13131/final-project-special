@@ -1,22 +1,11 @@
-from project.models import Set, Exercise
-import json
-
-
 import flet as ft
-import math
-
 import login_signup
 import learn_more_page
 
-class First_page:
 
+class First_page:
     def __init__(self) -> None:
         self.page = None
-        # self.client = client
-
-        # Create a button to navigate to App3 page
-        self.text = ft.Text("Welcome To The Fitness App :)", size=55, color='#8532B8', weight=ft.FontWeight.W_500,
-                            selectable=True, font_family="Elephant")
 
         self.button_to_login = ft.ElevatedButton(text="To login", on_click=self.go_to_login, bgcolor='#8532B8',
                                                  color='white')
@@ -40,29 +29,27 @@ class First_page:
                     ft.Text("POWER APP ", size=80, color=ft.colors.BLACK, weight=ft.FontWeight.W_500,
                             selectable=True, font_family="Century Gothic")
                 ]),
-            ],
-        )
 
-        self.main_panel1 = ft.Row(
-            # width=600,
-            controls=[
-                ft.Container(
-                    margin=10,
-                    padding=10,
-                    alignment=ft.alignment.center,
-                    # bgcolor='#CC99FF',
-                    content=ft.Row(
-                        [
+                ft.Row(
+                    # width=600,
+                    controls=[
+                        ft.Container(
+                            margin=20,
+                            padding=20,
+                            alignment=ft.alignment.center,
+                            content=ft.Row(
+                                [
 
-                            self.button_to_login,
-                            self.button_to_signup,
-                            self.button_to_learnmore
-                        ]
-                    )
+                                    self.button_to_login,
+                                    self.button_to_signup,
+                                    self.button_to_learnmore
+                                ]
+                            )
+                        )
+                    ],
                 )
             ],
         )
-
 
     def go_to_login(self, e: ft.ControlEvent) -> None:
         # Function to navigate to App3 page
@@ -85,24 +72,16 @@ class First_page:
     def main(self, page: ft.Page) -> None:
         self.page = page
         self.page.bgcolor = ft.colors.WHITE
-        row_container = ft.Row([self.main_panel], auto_scroll=True)
+        row_container = ft.Row([self.main_panel])
         row_container.main_alignment = ft.MainAxisAlignment.CENTER
 
         row_container.width = 920
         self.page.add(row_container)
-        self.page.update()
-
-        row_container = ft.Row([self.main_panel1], auto_scroll=True)
-        row_container.main_alignment = ft.MainAxisAlignment.CENTER
-
-        row_container.width = 920
-        self.page.add(row_container)
-
-        self.page.update()
-
 
         self.page.horizontal_alignment = 'CENTER'
         self.page.vertical_alignment = 'CENTER'
+
+        self.page.update()
 
 
 def main() -> None:
