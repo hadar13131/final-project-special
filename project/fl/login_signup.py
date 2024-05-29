@@ -437,14 +437,14 @@ class SignUpPage:
         lastname = self.lastname2.value
         phone_number = self.phone_number.value
         email = self.email.value
-        age = int(self.age.value)
+        age = self.age.value
         gender = self.gender.value
         goals = self.goals.value
 
         if firstname and lastname and phone_number and email and age and gender and goals:
-            if c_e.is_valid_phone_number(phone_number):
+            if c_e.is_valid_phone_number(phone_number) and c_e.is_numeric(age):
                 response = self.client.fill_info(name=username1, first_name=firstname, last_name=lastname,
-                                                 phone_num=phone_number, email=email, age=age, gender=gender, goals=goals)
+                                                 phone_num=phone_number, email=email, age=int(age), gender=gender, goals=goals)
                 self.massageF1.value = response["response"]
 
                 if self.massageF1.value == "the information added":
@@ -455,8 +455,12 @@ class SignUpPage:
                     # self.page.add(row)
                 self.page.update()
 
-            else:
+            elif not c_e.is_valid_phone_number(phone_number):
                 self.massageF1.value = "the phone number is not write correctly"
+                self.page.update()
+
+            else:
+                self.massageF1.value = "the age should be number"
                 self.page.update()
         else:
             self.massageF1.value = "please fill the all fields"
