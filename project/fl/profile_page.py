@@ -408,7 +408,9 @@ class Profile_Page:
         return lst
 
     def future_workouts_by_value(self, value):
-        workout_lst = self.client.user_workout_lst
+        workout_lst1 = self.client.user_workout_lst
+
+        workout_lst = self.sort_workout_by_date(workout_lst1)
 
         lst = []
         for i in workout_lst:
@@ -428,6 +430,10 @@ class Profile_Page:
                 n = n + 1
 
         return n
+
+    def sort_workout_by_date(self, workout_lst):
+        new_lst = sorted(workout_lst, key=lambda x: x[3])
+        return new_lst
 
 
     def main(self, page: ft.Page) -> None:

@@ -198,14 +198,15 @@ def delete(name: str, password: str) -> dict[str, str]:
             response = delete_shared_workouts(chosed_user=name)
 
             find = session.query(workout_table).filter(workout_table.c.userid == name).all()
-            for workuot in find: #delete all of his workouts
-                session.execute(
-                    workout_table.delete().where(
-                        workout_table.c.workoutid == workuot[0]
+            if find:
+                for workuot in find: #delete all of his workouts
+                    session.execute(
+                        workout_table.delete().where(
+                            workout_table.c.workoutid == workuot[0]
+                        )
                     )
-                )
 
-            session.commit()
+                    session.commit()
 
             return {"response": "delete success"}
 

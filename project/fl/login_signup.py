@@ -339,7 +339,8 @@ class SignUpPage:
 
     def back_to_password(self, e: ft.ControlEvent) -> None:
         #delete the username and the password theye fill at the last page and insert to the database
-        response = self.client.delete(self.username2.value, self.password2.value)
+        password = hashlib.sha256(self.password2.value.encode()).hexdigest()
+        response = self.client.delete(self.username2.value, password)
         # self.massageS2.value = response["response"]
         self.client = Client()
         self.page.clean()

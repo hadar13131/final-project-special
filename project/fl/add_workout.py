@@ -415,6 +415,10 @@ class EditWorkout:
 
     def back_to_choose_exercise(self, e: ft.ControlEvent):
         self.page.clean()
+        self.lst_name_exercises = ft.Dropdown(
+            width=300,
+            options=self.return_exercises_names(date=self.first_date, workout_name=self.workoutname),
+        )
         self.page.add(self.workout_details_panel_final)
         self.page.add(ft.Row(alignment=ft.alignment.center, controls=[self.lst_name_exercises, self.button_show_add_exercise]))
         # self.page.add(self.lst_name_exercises)
@@ -658,10 +662,10 @@ class EditWorkout:
             self.massageD1.value = self.first_date.strftime("%x")
 
             self.page.clean()
+            self.page.add(ft.Row([self.button_BACK_exercise]))
             self.exercise_name_to_change.value = ""
             self.power_to_change.value = ""
             self.page.add(self.edit_panel2)  # the details of the selected workout
-            self.page.add(ft.Row([self.button_BACK_exercise]))
             self.page.add(self.exercise_name_to_change,
                           ft.Row([ft.Text('CHANGE POWER- ', size=15, font_family="Century Gothic"), self.power_to_change]))  # space to fill new name and new date of the workout
             self.massage.value = ""

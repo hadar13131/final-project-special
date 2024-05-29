@@ -25,11 +25,13 @@ class ServerVeiw:
             icon=ft.icons.REPLAY_CIRCLE_FILLED, on_click=self.load_again, data=0
         )
 
+
     def load_again(self, e: ft.ControlEvent):
         self.page.clean()
         self.page.add(self.button_load)
         self.page.add(self.return_workout_table())
         self.page.update()
+
 
     def return_workout_table(self):
         self.user_lst = self.temp_server.signed_up_users()["response"]
